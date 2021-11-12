@@ -73,7 +73,6 @@ public class AdvanceImage {
      * 通过类选择器获取首页的照片粗略图路径
      *
      * @param className 类选择器名称
-     * @return
      */
     public static List<String> getIndexImage(String className) {
         List<String> hrefs = new ArrayList<>();
@@ -97,7 +96,6 @@ public class AdvanceImage {
      * 解析不同标签中的缩略图路径
      *
      * @param className 标签的class属性名
-     * @return
      */
     public static List<String> getTagThumbnail(String className) {
         List<String> hrefs = new ArrayList<>();

@@ -17,26 +17,12 @@ import java.util.stream.Collectors;
 
 /**
  * json 爬虫学习
- * <p>
- * Host: f.renwox.cn
- * //        Connection: keep-alive
- * //        sec-ch-ua: "Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"
- * //        sec-ch-ua-mobile: ?0
- * //        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36
- * //        sec-ch-ua-platform: "Windows"
- * //        Accept:
- * //        Origin: https://bizhi.vercel.app
- * //        Sec-Fetch-Site: cross-site
- * //        Sec-Fetch-Mode: cors
- * //        Sec-Fetch-Dest: empty
- * //        Referer: https://bizhi.vercel.app/
- * //        Accept-Encoding: gzip, deflate, br
- * //        Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
  **/
 
 public class JsoupImage {
     public static void main(String[] args) throws Exception {
         jsoupImage2("https://wallhaven.cc/");
+        jsoupImage(" ");
     }
 
 
@@ -57,7 +43,7 @@ public class JsoupImage {
     /**
      * 使用爬虫进行爬取
      *
-     * @param path
+     * @param path 网站路径
      */
     public static void jsoupImage(String path) throws Exception {
         // 解析路径
@@ -82,7 +68,7 @@ public class JsoupImage {
         }
         imagePath = imagePath.stream().map(s -> path + s).collect(Collectors.toList());
 
-        Integer id = 1;
+        int id = 1;
         for (String s : imagePath) {
             URL url = new URL(s);
             URLConnection urlConnection = url.openConnection();
@@ -90,7 +76,7 @@ public class JsoupImage {
             // 写入本地文件
             FileOutputStream fileOutputStream = new FileOutputStream("D:\\Files\\pachong\\" + id + ".jpg");
             id++;
-            int temp = 0;
+            int temp;
             while ((temp = inputStream.read()) != -1)
                 fileOutputStream.write(temp);
             System.out.println("图片写入成功");
