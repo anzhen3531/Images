@@ -1,2 +1,17 @@
 server:
-  port: 9999
+  port: 9920
+
+
+spring:
+  datasource:
+    username: root
+    password: anzhen3531
+    url: jdbc:mysql://:3306/imageprodect?useUnicode=true&characterEncoding=utf8
+    driver-class-name: com.mysql.jdbc.Driver
+# minio 参数配置
+minio:
+  endpoint: http://182.42.116.193
+  port: 9000
+  accessKey: minio
+  secretKey: minio@123
+  bucket: image
