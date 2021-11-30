@@ -74,6 +74,8 @@ public class JsoupImage {
             URLConnection urlConnection = url.openConnection();
             InputStream inputStream = urlConnection.getInputStream();
             // 写入本地文件
+
+            // 直接写入到 minio中  将这个爬虫改为定时任务  每天晚上准时拉去图片 todo
             FileOutputStream fileOutputStream = new FileOutputStream("D:\\Files\\pachong\\" + id + ".jpg");
             id++;
             int temp;
