@@ -12,4 +12,19 @@ public interface FileUploadService {
      */
     void fileUpload(String bucketName, MultipartFile file);
 
+    /**
+     * minio 进行图片存储
+     *
+     * @return
+     */
+    void delFile(String bucketName, String fileName);
+
+    /**
+     * 获取图片路径
+     *
+     * @param bucketName 桶名称
+     * @param fileName   文件名称
+     * @return
+     */
+    String getFileUrl(String bucketName, String fileName);
 }

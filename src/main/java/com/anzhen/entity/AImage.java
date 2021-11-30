@@ -3,6 +3,7 @@ package com.anzhen.entity;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,7 +23,8 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "AImage对象", description = "数据库图片存储表")
 public class AImage implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    @TableId
+    private Long id;
 
     private String imageId;
 

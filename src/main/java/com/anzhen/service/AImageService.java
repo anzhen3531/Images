@@ -2,6 +2,7 @@ package com.anzhen.service;
 
 import com.anzhen.entity.AImage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -13,4 +14,17 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface AImageService extends IService<AImage> {
 
+    /**
+     * 上传图片
+     *
+     * @param multipartFile
+     */
+    void uploadFileAndDb(MultipartFile multipartFile);
+
+    /**
+     * 删除图片
+     *
+     * @param id
+     */
+    void delete(Long id);
 }

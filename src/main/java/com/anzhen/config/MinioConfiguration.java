@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties({MinioProperties.class})
-public class MinIOConfiguration {
+public class MinioConfiguration {
     @Bean
     public MinioClient minioClient(@Autowired MinioProperties minioProperties) {
         return MinioClient
