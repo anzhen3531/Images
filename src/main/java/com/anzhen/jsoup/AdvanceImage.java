@@ -1,10 +1,13 @@
 package com.anzhen.jsoup;
 
+import com.anzhen.service.AImageService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -18,9 +21,20 @@ import java.util.concurrent.TimeUnit;
 /**
  * 这个只是针对首页
  */
+@Component
 public class AdvanceImage {
 
+    @Resource
+    AImageService aImageService;
+
+    /**
+     * 封装请求头
+     */
     static HashMap<String, String> headers = new HashMap<>();
+
+    /**
+     * 文档对象
+     */
     static Document document;
 
     // 封装请求头
@@ -33,29 +47,16 @@ public class AdvanceImage {
     }
 
     /**
-     * 网站路径
-     *
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-//        getThumbnail("https://wallhaven.cc/");
-        for (int i = 10; i < 15; i++) {
-            getThumbnail("https://wallhaven.cc/hot?page=" + i);
-        }
-    }
-
-    /**
      * 获取缩略图List
      *
      * @param path 网址路径
      */
-    public static void getThumbnail(String path) throws Exception {
+    public void getThumbnail(String path) throws Exception {
         document = Jsoup.connect(path).headers(headers).get();
+        System.out.println("解析文件成功");
         // 获取首页标签的缩略图
-//        List<String> tagThumbnail = getTagThumbnail("more-feat");
         List<String> tagThumbnail = getIndexImage("thumb-listing-page");
-        System.out.println("粗略图的数量" + tagThumbnail.size());
+        System.out.println("获取图片选择器成功");
         for (String s : tagThumbnail) {
             // 代码优化 使用异步写入文件
             List<String> photoPath = getPhotoPath(Jsoup.connect(s).headers(headers).get());
@@ -64,17 +65,16 @@ public class AdvanceImage {
                 writePhoto(s1);
             }
             // 线程睡眠3秒  如果不暂停的话，会出现请求发送过多的  429
-            Thread.sleep(TimeUnit.SECONDS.toMillis(3));
+            Thread.sleep(TimeUnit.SECONDS.toMillis(2));
         }
     }
-
 
     /**
      * 通过类选择器获取首页的照片粗略图路径
      *
      * @param className 类选择器名称
      */
-    public static List<String> getIndexImage(String className) {
+    public List<String> getIndexImage(String className) {
         List<String> hrefs = new ArrayList<>();
         Elements elements = document.getElementsByClass(className);
         for (Element element : elements) {
@@ -87,7 +87,6 @@ public class AdvanceImage {
                         hrefs.add(href);
                 }
             }
-
         }
         return hrefs;
     }
@@ -97,7 +96,7 @@ public class AdvanceImage {
      *
      * @param className 标签的class属性名
      */
-    public static List<String> getTagThumbnail(String className) {
+    public List<String> getTagThumbnail(String className) {
         List<String> hrefs = new ArrayList<>();
         Elements elements = document.getElementsByClass(className);
         for (Element element : elements) {
@@ -113,7 +112,7 @@ public class AdvanceImage {
     /**
      * 遍历缩略图路径   获取大图路径
      */
-    public static List<String> getPhotoPath(Document document) {
+    public List<String> getPhotoPath(Document document) {
         List<String> list = new ArrayList<>();
         Elements scrollbox = document.getElementsByClass("scrollbox");
         for (Element element : scrollbox) {
@@ -130,16 +129,14 @@ public class AdvanceImage {
     /**
      * 写入到本地文件
      */
-    public static void writePhoto(String path) throws Exception {
+    public void writePhoto(String path) throws Exception {
         URL url = new URL(path);
         URLConnection urlConnection = url.openConnection();
+
         InputStream inputStream = urlConnection.getInputStream();
-        // 写入本地文件
-        FileOutputStream fileOutputStream =
-                new FileOutputStream("D:\\Files\\pachong\\" + UUID.randomUUID().toString() + ".jpg");
-        int temp;
-        while ((temp = inputStream.read()) != -1)
-            fileOutputStream.write(temp);
-        System.out.println("图片写入成功");
+        // 获取后缀
+        String suffix = path.substring(path.lastIndexOf("."));
+        // 使用流去写入文件
+        aImageService.uploadFileAndDb(inputStream, UUID.randomUUID().toString() + suffix);
     }
 }

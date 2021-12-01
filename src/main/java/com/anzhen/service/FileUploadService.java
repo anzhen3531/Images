@@ -2,6 +2,8 @@ package com.anzhen.service;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
+
 public interface FileUploadService {
 
     /**
@@ -11,6 +13,18 @@ public interface FileUploadService {
      * @param file       文件
      */
     void fileUpload(String bucketName, MultipartFile file);
+
+    /**
+     * 文件上传接口
+     *
+     * @param bucketName
+     * @param filePath
+     * @param inputStream
+     */
+    void fileUpload(String bucketName, String filePath, InputStream inputStream) throws Exception;
+
+
+    void fileUpload(String bucketName, String filePath, InputStream inputStream, String contentType) throws Exception;
 
     /**
      * minio 进行图片存储

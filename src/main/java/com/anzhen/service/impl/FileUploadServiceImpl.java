@@ -1,7 +1,10 @@
 package com.anzhen.service.impl;
 
 import com.anzhen.service.FileUploadService;
-import io.minio.*;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.InputStream;
 
 
 @Slf4j
@@ -34,6 +38,34 @@ public class FileUploadServiceImpl implements FileUploadService {
                 .object(file.getOriginalFilename())
                 .stream(file.getInputStream(), file.getSize(), -1)
                 .contentType(file.getContentType()).build();
+        minioClient.putObject(objectArgs);
+        log.info("图片上传成功");
+    }
+
+    @Override
+    public void fileUpload(String bucketName, String filePath, InputStream inputStream) throws Exception {
+        // 构建文件上传对象
+        PutObjectArgs objectArgs = PutObjectArgs
+                .builder()
+                .bucket(bucketName)
+                .object(filePath)
+                .stream(inputStream, inputStream.available(), -1)
+                .contentType("application/octet-stream")
+                .build();
+        minioClient.putObject(objectArgs);
+        log.info("图片上传成功");
+    }
+
+    @Override
+    public void fileUpload(String bucketName, String filePath, InputStream inputStream, String contentType) throws Exception {
+        // 构建文件上传对象
+        PutObjectArgs objectArgs = PutObjectArgs
+                .builder()
+                .bucket(bucketName)
+                .object(filePath)
+                .stream(inputStream, inputStream.available(), -1)
+                .contentType(contentType)
+                .build();
         minioClient.putObject(objectArgs);
         log.info("图片上传成功");
     }

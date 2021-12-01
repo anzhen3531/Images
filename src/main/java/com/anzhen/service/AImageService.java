@@ -4,6 +4,8 @@ import com.anzhen.entity.AImage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
+
 /**
  * <p>
  * 数据库图片存储表 服务类
@@ -20,6 +22,17 @@ public interface AImageService extends IService<AImage> {
      * @param multipartFile
      */
     void uploadFileAndDb(MultipartFile multipartFile);
+
+    /**
+     * 通过流上传文件
+     *
+     * @param inputStream
+     * @param filePath
+     * @throws Exception
+     */
+    void uploadFileAndDb(InputStream inputStream, String filePath) throws Exception;
+
+    void uploadFileAndDb(InputStream inputStream, String filePath, String contentType) throws Exception;
 
     /**
      * 删除图片

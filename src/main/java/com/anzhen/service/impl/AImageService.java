@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.InputStream;
 
 /**
  * <p>
@@ -38,6 +39,24 @@ public class AImageService
         // 将文件设置进去数据库
         AImage aImage = new AImage();
         aImage.setImagePath(fileUrl);
+        aImageMapper.insert(aImage);
+    }
+
+    @Override
+    public void uploadFileAndDb(InputStream inputStream, String filePath) throws Exception {
+        fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream);
+        // 将文件设置进去数据库
+        AImage aImage = new AImage();
+        aImage.setImagePath(filePath);
+        aImageMapper.insert(aImage);
+    }
+
+    @Override
+    public void uploadFileAndDb(InputStream inputStream, String filePath, String contentType) throws Exception {
+        fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream, contentType);
+        // 将文件设置进去数据库
+        AImage aImage = new AImage();
+        aImage.setImagePath(filePath);
         aImageMapper.insert(aImage);
     }
 

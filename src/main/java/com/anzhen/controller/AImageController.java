@@ -2,6 +2,7 @@ package com.anzhen.controller;
 
 
 import com.anzhen.config.MinioProperties;
+import com.anzhen.jsoup.JobImage;
 import com.anzhen.service.AImageService;
 import com.anzhen.service.FileUploadService;
 import io.swagger.annotations.Api;
@@ -28,11 +29,13 @@ public class AImageController {
 
     @Resource
     AImageService aImageService;
+    @Resource
+    JobImage jobImage;
 
     @ApiOperation("图片上传")
     @PostMapping("/upload")
-    public String photoUpload(MultipartFile multipartFile) {
-        aImageService.uploadFileAndDb(multipartFile);
+    public String photoUpload() throws Exception {
+        jobImage.execute();
         return "200 OK";
     }
 

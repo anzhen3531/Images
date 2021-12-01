@@ -82,7 +82,6 @@ public class JsoupImage {
             while ((temp = inputStream.read()) != -1)
                 fileOutputStream.write(temp);
             System.out.println("图片写入成功");
-
             inputStream.close();
             fileOutputStream.close();
         }
