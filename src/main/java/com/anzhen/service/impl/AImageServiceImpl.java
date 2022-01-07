@@ -21,7 +21,7 @@ import java.io.InputStream;
  * @since 2021-11-13
  */
 @Service
-public class AImageService
+public class AImageServiceImpl
         extends ServiceImpl<AImageMapper, AImage>
         implements com.anzhen.service.AImageService {
 
@@ -45,15 +45,6 @@ public class AImageService
     @Override
     public void uploadFileAndDb(InputStream inputStream, String filePath) throws Exception {
         fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream);
-        // 将文件设置进去数据库
-        AImage aImage = new AImage();
-        aImage.setImagePath(filePath);
-        aImageMapper.insert(aImage);
-    }
-
-    @Override
-    public void uploadFileAndDb(InputStream inputStream, String filePath, String contentType) throws Exception {
-        fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream, contentType);
         // 将文件设置进去数据库
         AImage aImage = new AImage();
         aImage.setImagePath(filePath);

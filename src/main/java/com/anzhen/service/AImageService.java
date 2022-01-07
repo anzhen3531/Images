@@ -32,8 +32,6 @@ public interface AImageService extends IService<AImage> {
      */
     void uploadFileAndDb(InputStream inputStream, String filePath) throws Exception;
 
-    void uploadFileAndDb(InputStream inputStream, String filePath, String contentType) throws Exception;
-
     /**
      * 删除图片
      *

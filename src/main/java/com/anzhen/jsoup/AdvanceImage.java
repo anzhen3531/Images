@@ -8,10 +8,8 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -130,13 +128,15 @@ public class AdvanceImage {
      * 写入到本地文件
      */
     public void writePhoto(String path) throws Exception {
-        URL url = new URL(path);
-        URLConnection urlConnection = url.openConnection();
-
-        InputStream inputStream = urlConnection.getInputStream();
+        InputStream inputStream = new URL(path).openStream();
         // 获取后缀
+        // 直接将流写入本地文件
+        // 之后将本地文件转换为流
+        // 之后删除本地文件
+        // 上传Minio
         String suffix = path.substring(path.lastIndexOf("."));
+        String fileName = path.substring(path.lastIndexOf("/"));
         // 使用流去写入文件
-        aImageService.uploadFileAndDb(inputStream, UUID.randomUUID().toString() + suffix);
+        aImageService.uploadFileAndDb(inputStream, fileName + suffix);
     }
 }

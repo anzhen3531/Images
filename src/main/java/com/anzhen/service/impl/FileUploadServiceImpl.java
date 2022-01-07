@@ -50,26 +50,10 @@ public class FileUploadServiceImpl implements FileUploadService {
                 .bucket(bucketName)
                 .object(filePath)
                 .stream(inputStream, inputStream.available(), -1)
-                .contentType("application/octet-stream")
                 .build();
         minioClient.putObject(objectArgs);
         log.info("图片上传成功");
     }
-
-    @Override
-    public void fileUpload(String bucketName, String filePath, InputStream inputStream, String contentType) throws Exception {
-        // 构建文件上传对象
-        PutObjectArgs objectArgs = PutObjectArgs
-                .builder()
-                .bucket(bucketName)
-                .object(filePath)
-                .stream(inputStream, inputStream.available(), -1)
-                .contentType(contentType)
-                .build();
-        minioClient.putObject(objectArgs);
-        log.info("图片上传成功");
-    }
-
 
     /**
      * 删除文件

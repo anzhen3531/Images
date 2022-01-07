@@ -7,7 +7,7 @@ import java.io.InputStream;
 public interface FileUploadService {
 
     /**
-     * 文件上传接口
+     * 文件上传接口  minio
      *
      * @param bucketName 同名称
      * @param file       文件
@@ -22,9 +22,6 @@ public interface FileUploadService {
      * @param inputStream
      */
     void fileUpload(String bucketName, String filePath, InputStream inputStream) throws Exception;
-
-
-    void fileUpload(String bucketName, String filePath, InputStream inputStream, String contentType) throws Exception;
 
     /**
      * minio 进行图片存储
