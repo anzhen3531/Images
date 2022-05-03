@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 
 public class JsoupImage {
     public static void main(String[] args) throws Exception {
-        jsoupImage2("https://wallhaven.cc/");
-        jsoupImage(" ");
+//        jsoupImage2("https://wallhaven.cc/");
+        jsoupImage("https://wallhaven.cc/");
     }
 
 
@@ -69,12 +69,12 @@ public class JsoupImage {
         imagePath = imagePath.stream().map(s -> path + s).collect(Collectors.toList());
 
         int id = 1;
+        // todo 使用NIO进行改造 提高IO效率
         for (String s : imagePath) {
             URL url = new URL(s);
             URLConnection urlConnection = url.openConnection();
             InputStream inputStream = urlConnection.getInputStream();
             // 写入本地文件
-
             // 直接写入到 minio中  将这个爬虫改为定时任务  每天晚上准时拉去图片 todo
             FileOutputStream fileOutputStream = new FileOutputStream("D:\\Files\\pachong\\" + id + ".jpg");
             id++;
@@ -86,5 +86,4 @@ public class JsoupImage {
             fileOutputStream.close();
         }
     }
-
 }

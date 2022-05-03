@@ -1,7 +1,6 @@
 server:
   port: 9920
 
-
 spring:
   datasource:
     username: root
@@ -12,6 +11,6 @@ spring:
 minio:
   endpoint: http://182.42.116.193
   port: 9000
-  accessKey: minio
-  secretKey: minio@123
+  accessKey: root
+  secretKey: root123456
   bucket: image

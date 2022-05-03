@@ -14,7 +14,7 @@ public class MinioConfiguration {
     public MinioClient minioClient(@Autowired MinioProperties minioProperties) {
         return MinioClient
                 .builder()
-                .endpoint(minioProperties.getEndpoint()+ ":" + minioProperties.getPort())
+                .endpoint(minioProperties.getEndpoint() + ":" + minioProperties.getPort())
                 .credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey())
                 .build();
     }

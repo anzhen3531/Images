@@ -1,6 +1,5 @@
 package com.anzhen.config;
 
-import io.swagger.annotations.Api;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -24,7 +23,6 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.basePackage("com.anzhen.controller"))
                 .paths(PathSelectors.any())
                 .build();
-//        return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class)).build();
     }
 
     //构建 api文档的详细信息函数,注意这里的注解引用的是哪个

@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class AdvanceImage {
             // 代码优化 使用异步写入文件
             List<String> photoPath = getPhotoPath(Jsoup.connect(s).headers(headers).get());
             System.out.println(photoPath);
+            // 写入本地文件
             for (String s1 : photoPath) {
                 writePhoto(s1);
             }
@@ -134,9 +136,20 @@ public class AdvanceImage {
         // 之后将本地文件转换为流
         // 之后删除本地文件
         // 上传Minio
-        String suffix = path.substring(path.lastIndexOf("."));
-        String fileName = path.substring(path.lastIndexOf("/"));
-        // 使用流去写入文件
-        aImageService.uploadFileAndDb(inputStream, fileName + suffix);
+//        String suffix = path.substring(path.lastIndexOf("."));
+//        String fileName = path.substring(path.lastIndexOf("/"));
+//        // 使用流去写入文件
+//        aImageService.uploadFileAndDb(inputStream, fileName + suffix);
+        // 写入本地文件  todo 使用NIO进行操作提高效率
+        // 解决流 存入MINIO中图片失效的问题
+        // 第一种方案   可以使用先保存本地文件之后上传MINIO之后删除的方案
+        // 第二种方案   直接使用流  解决MinIO用流上传文件损坏的问题
+        try (FileOutputStream fileOutputStream =
+                     new FileOutputStream("D:\\Files\\" + UUID.randomUUID() + ".jpg")) {
+            int temp;
+            while ((temp = inputStream.read()) != -1)
+                fileOutputStream.write(temp);
+        }
+        System.out.println("图片写入成功");
     }
 }

@@ -17,10 +17,10 @@ public class JobImage {
 
     public void execute() throws Exception {
 //        for (int i = 15; i < 30; i++) {
-        // 遍历
-//        advanceImage.getThumbnail("https://wallhaven.cc/hot?page=" + 1);
+//            遍历
+        advanceImage.getThumbnail("https://wallhaven.cc/hot?page=" + 1);
 //        }
-        InputStream inputStream = new URL("https://w.wallhaven.cc/full/rd/wallhaven-rdeylw.jpg").openStream();
-        fileUploadService.fileUpload("image", "wallhaven-rdeylw.jpg", inputStream);
+//        InputStream inputStream = new URL("https://w.wallhaven.cc/full/rd/wallhaven-rdeylw.jpg").openStream();
+//        fileUploadService.fileUpload("image", "wallhaven-rdeylw.jpg", inputStream);
     }
 }

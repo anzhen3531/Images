@@ -4,6 +4,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 
+/**
+ * 文件上传服务
+ *
+ * @author AnZhen
+ */
 public interface FileUploadService {
 
     /**
