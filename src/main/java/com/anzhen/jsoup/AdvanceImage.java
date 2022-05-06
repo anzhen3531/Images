@@ -2,6 +2,7 @@ package com.anzhen.jsoup;
 
 import com.anzhen.service.AImageService;
 import org.jsoup.Jsoup;
+import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -10,7 +11,14 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +30,11 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class AdvanceImage {
+
+    /**
+     * 创建默认大小的缓冲区
+     */
+    static ByteBuffer buffer = ByteBuffer.allocate(1024);
 
     @Resource
     AImageService aImageService;
@@ -62,10 +75,15 @@ public class AdvanceImage {
             System.out.println(photoPath);
             // 写入本地文件
             for (String s1 : photoPath) {
-                writePhoto(s1);
+                // 写入一张17mb的文件 堵塞IO使用时间为33s
+//                writePhoto(s1);
+                // NIO 使用时间为27s  超过 阻塞IO 6秒时间
+                writeNioPhoto(s1);
+                break;
             }
             // 线程睡眠3秒  如果不暂停的话，会出现请求发送过多的  429
             Thread.sleep(TimeUnit.SECONDS.toMillis(2));
+            break;
         }
     }
 
@@ -130,6 +148,11 @@ public class AdvanceImage {
      * 写入到本地文件
      */
     public void writePhoto(String path) throws Exception {
+        if (StringUtil.isBlank(path)) {
+            return;
+        }
+        long startTime = System.currentTimeMillis();
+        // 打开url 流
         InputStream inputStream = new URL(path).openStream();
         // 获取后缀
         // 直接将流写入本地文件
@@ -142,7 +165,7 @@ public class AdvanceImage {
 //        aImageService.uploadFileAndDb(inputStream, fileName + suffix);
         // 写入本地文件  todo 使用NIO进行操作提高效率
         // 解决流 存入MINIO中图片失效的问题
-        // 第一种方案   可以使用先保存本地文件之后上传MINIO之后删除的方案
+        // 第一种方案   可以使用先保存本地文件之后上传MINIO之后删除的方案   今天使用NIO解决复用问题
         // 第二种方案   直接使用流  解决MinIO用流上传文件损坏的问题
         try (FileOutputStream fileOutputStream =
                      new FileOutputStream("D:\\Files\\" + UUID.randomUUID() + ".jpg")) {
@@ -150,6 +173,44 @@ public class AdvanceImage {
             while ((temp = inputStream.read()) != -1)
                 fileOutputStream.write(temp);
         }
-        System.out.println("图片写入成功");
+        long endTime = System.currentTimeMillis();
+        System.out.println("写入完成 ！！！！");
+        System.out.println("耗时为:" + (endTime - startTime) / 1000);
+    }
+
+    /**
+     * 使用NIO写入文件
+     *
+     * @param path
+     */
+    public void writeNioPhoto(String path) throws Exception {
+        if (StringUtil.isBlank(path)) {
+            return;
+        }
+        long startTime = System.currentTimeMillis();
+        InputStream inputStream = new URL(path).openStream();
+        RandomAccessFile rw = new RandomAccessFile("D:\\Files\\" + UUID.randomUUID() + ".jpg", "rw");
+        // 打开FileChannel
+        FileChannel channel = rw.getChannel();
+
+        byte[] readAllBytes = inputStream.readAllBytes();
+        // 通过判断来确定开辟的区域是否大于当前图片的大小
+        if (readAllBytes.length > buffer.capacity()) {
+            buffer = ByteBuffer.allocate(readAllBytes.length);
+        }
+        buffer.put(readAllBytes);
+        // 初始化缓冲区位置
+        buffer.flip();
+        // 写入操作
+        while (buffer.hasRemaining()) {
+            channel.write(buffer);
+        }
+        // 关闭流
+        channel.close();
+        inputStream.close();
+        buffer.clear();
+        long endTime = System.currentTimeMillis();
+        System.out.println("写入完成 ！！！！");
+        System.out.println("耗时为:" + (endTime - startTime) / 1000);
     }
 }
