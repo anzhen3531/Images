@@ -79,11 +79,9 @@ public class AdvanceImage {
 //                writePhoto(s1);
                 // NIO 使用时间为27s  超过 阻塞IO 6秒时间
                 writeNioPhoto(s1);
-                break;
             }
             // 线程睡眠3秒  如果不暂停的话，会出现请求发送过多的  429
             Thread.sleep(TimeUnit.SECONDS.toMillis(2));
-            break;
         }
     }
 
