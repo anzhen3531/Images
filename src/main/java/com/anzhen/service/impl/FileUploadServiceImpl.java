@@ -47,11 +47,10 @@ public class FileUploadServiceImpl implements FileUploadService {
      * @param bucketName  : 桶名
      * @param filePath    : 文件名
      * @param inputStream : 文件流
-     * @throws Exception
+     * @param objectSize  : 文件对象大小
      */
     @Override
     public void fileUpload(String bucketName, String filePath, InputStream inputStream, Integer objectSize) throws Exception {
-        log.info("流的可用为：" + inputStream.available());
         // 构建文件上传对象
         PutObjectArgs objectArgs = PutObjectArgs
                 .builder()

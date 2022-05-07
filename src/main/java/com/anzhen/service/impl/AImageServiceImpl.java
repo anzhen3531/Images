@@ -47,6 +47,9 @@ public class AImageServiceImpl
         fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream, objectSize);
         // 将文件设置进去数据库
         AImage aImage = new AImage();
+        // 设置默认属性
+        aImage.setImageId("pc" + System.currentTimeMillis());
+        aImage.setState(1);
         aImage.setImagePath(filePath);
         aImageMapper.insert(aImage);
     }

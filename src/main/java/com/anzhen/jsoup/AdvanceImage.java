@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 这个只是针对首页
@@ -61,7 +60,6 @@ public class AdvanceImage {
      * 获取缩略图List
      *
      * @param path 网址路径
-     * @notice 可以采用异步优化效率
      */
     public void getThumbnail(String path) throws Exception {
         document = Jsoup.connect(path).headers(headers).get();
@@ -81,11 +79,7 @@ public class AdvanceImage {
                 // NIO 使用时间为27s  超过 阻塞IO 6秒时间
 //                writeNioPhoto(s1);
                 writePhotoByMinIO(s1);
-                break;
             }
-            // 线程睡眠3秒  如果不暂停的话，会出现请求发送过多的  429
-            Thread.sleep(TimeUnit.SECONDS.toMillis(2));
-            break;
         }
     }
 
@@ -156,19 +150,6 @@ public class AdvanceImage {
         long startTime = System.currentTimeMillis();
         // 打开url 流
         InputStream inputStream = new URL(path).openStream();
-        // 获取后缀
-        // 直接将流写入本地文件
-        // 之后将本地文件转换为流
-        // 之后删除本地文件
-        // 上传Minio
-//        String suffix = path.substring(path.lastIndexOf("."));
-//        String fileName = path.substring(path.lastIndexOf("/"));
-//        // 使用流去写入文件
-//        aImageService.uploadFileAndDb(inputStream, fileName + suffix);
-        // 写入本地文件  todo 使用NIO进行操作提高效率
-        // 解决流 存入MINIO中图片失效的问题
-        // 第一种方案   可以使用先保存本地文件之后上传MINIO之后删除的方案   今天使用NIO解决复用问题
-        // 第二种方案   直接使用流  解决MinIO用流上传文件损坏的问题
         try (FileOutputStream fileOutputStream =
                      new FileOutputStream("D:\\Files\\" + UUID.randomUUID() + ".jpg")) {
             int temp;
@@ -181,9 +162,9 @@ public class AdvanceImage {
     }
 
     /**
-     * 使用NIO写入文件
+     * 使用NIO写入本地文件
      *
-     * @param path
+     * @param path : 文件路径
      */
     public void writeNioPhoto(String path) throws Exception {
         if (StringUtil.isBlank(path)) {
@@ -226,10 +207,8 @@ public class AdvanceImage {
         // 打开url 流
         URLConnection urlConnection = new URL(path).openConnection();
         InputStream inputStream = urlConnection.getInputStream();
-        log.info("inputStream available length :", inputStream.available());
         String suffix = path.substring(path.lastIndexOf("."));
-        String fileName = path.substring(path.lastIndexOf("/"));
         // 使用流去写入文件
-        aImageService.uploadFileAndDb(inputStream, fileName + suffix, urlConnection.getContentLength());
+        aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength());
     }
 }
