@@ -19,7 +19,6 @@ import java.io.InputStream;
 @Service
 public class FileUploadServiceImpl implements FileUploadService {
 
-
     @Resource
     MinioClient minioClient;
 
@@ -42,14 +41,24 @@ public class FileUploadServiceImpl implements FileUploadService {
         log.info("图片上传成功");
     }
 
+    /**
+     * 图片上传接口
+     *
+     * @param bucketName  : 桶名
+     * @param filePath    : 文件名
+     * @param inputStream : 文件流
+     * @throws Exception
+     */
     @Override
-    public void fileUpload(String bucketName, String filePath, InputStream inputStream) throws Exception {
+    public void fileUpload(String bucketName, String filePath, InputStream inputStream, Integer objectSize) throws Exception {
+        log.info("流的可用为：" + inputStream.available());
         // 构建文件上传对象
         PutObjectArgs objectArgs = PutObjectArgs
                 .builder()
                 .bucket(bucketName)
                 .object(filePath)
-                .stream(inputStream, inputStream.available(), -1)
+                .stream(inputStream, objectSize, -1)
+                .contentType("application/octet-stream")
                 .build();
         minioClient.putObject(objectArgs);
         log.info("图片上传成功");

@@ -1,6 +1,7 @@
 package com.anzhen.jsoup;
 
 import com.anzhen.service.AImageService;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
@@ -12,13 +13,10 @@ import javax.annotation.Resource;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +27,7 @@ import java.util.concurrent.TimeUnit;
  * 这个只是针对首页
  */
 @Component
+@Slf4j
 public class AdvanceImage {
 
     /**
@@ -62,6 +61,7 @@ public class AdvanceImage {
      * 获取缩略图List
      *
      * @param path 网址路径
+     * @notice 可以采用异步优化效率
      */
     public void getThumbnail(String path) throws Exception {
         document = Jsoup.connect(path).headers(headers).get();
@@ -74,14 +74,18 @@ public class AdvanceImage {
             List<String> photoPath = getPhotoPath(Jsoup.connect(s).headers(headers).get());
             System.out.println(photoPath);
             // 写入本地文件
+            // 可以采用线程池
             for (String s1 : photoPath) {
                 // 写入一张17mb的文件 堵塞IO使用时间为33s
 //                writePhoto(s1);
                 // NIO 使用时间为27s  超过 阻塞IO 6秒时间
-                writeNioPhoto(s1);
+//                writeNioPhoto(s1);
+                writePhotoByMinIO(s1);
+                break;
             }
             // 线程睡眠3秒  如果不暂停的话，会出现请求发送过多的  429
             Thread.sleep(TimeUnit.SECONDS.toMillis(2));
+            break;
         }
     }
 
@@ -210,5 +214,22 @@ public class AdvanceImage {
         long endTime = System.currentTimeMillis();
         System.out.println("写入完成 ！！！！");
         System.out.println("耗时为:" + (endTime - startTime) / 1000);
+    }
+
+    /**
+     * 通过MinIO接口进行上传
+     */
+    public void writePhotoByMinIO(String path) throws Exception {
+        if (StringUtil.isBlank(path)) {
+            return;
+        }
+        // 打开url 流
+        URLConnection urlConnection = new URL(path).openConnection();
+        InputStream inputStream = urlConnection.getInputStream();
+        log.info("inputStream available length :", inputStream.available());
+        String suffix = path.substring(path.lastIndexOf("."));
+        String fileName = path.substring(path.lastIndexOf("/"));
+        // 使用流去写入文件
+        aImageService.uploadFileAndDb(inputStream, fileName + suffix, urlConnection.getContentLength());
     }
 }

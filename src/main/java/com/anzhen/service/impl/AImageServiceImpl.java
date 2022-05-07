@@ -43,8 +43,8 @@ public class AImageServiceImpl
     }
 
     @Override
-    public void uploadFileAndDb(InputStream inputStream, String filePath) throws Exception {
-        fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream);
+    public void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize) throws Exception {
+        fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream, objectSize);
         // 将文件设置进去数据库
         AImage aImage = new AImage();
         aImage.setImagePath(filePath);

@@ -26,7 +26,7 @@ public interface FileUploadService {
      * @param filePath
      * @param inputStream
      */
-    void fileUpload(String bucketName, String filePath, InputStream inputStream) throws Exception;
+    void fileUpload(String bucketName, String filePath, InputStream inputStream, Integer objectSize) throws Exception;
 
     /**
      * minio 进行图片存储

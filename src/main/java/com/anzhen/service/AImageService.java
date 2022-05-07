@@ -30,7 +30,7 @@ public interface AImageService extends IService<AImage> {
      * @param filePath
      * @throws Exception
      */
-    void uploadFileAndDb(InputStream inputStream, String filePath) throws Exception;
+    void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize) throws Exception;
 
     /**
      * 删除图片

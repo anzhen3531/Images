@@ -9,8 +9,9 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
 # minio 参数配置
 minio:
-  endpoint: http://182.42.116.193
+  #  endpoint: http://182.42.116.193
+  endpoint: http://192.168.1.4
   port: 9000
-  accessKey: root
-  secretKey: root123456
-  bucket: image
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucket: wallhaven-photo
