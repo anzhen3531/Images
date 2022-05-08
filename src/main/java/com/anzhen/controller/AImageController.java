@@ -1,6 +1,7 @@
 package com.anzhen.controller;
 
 
+import com.anzhen.entity.AImage;
 import com.anzhen.jsoup.JobImage;
 import com.anzhen.service.AImageService;
 import io.swagger.annotations.Api;
@@ -8,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -26,6 +28,13 @@ public class AImageController {
     AImageService aImageService;
     @Resource
     JobImage jobImage;
+
+    @ApiOperation("分页图片查询")
+    @GetMapping("/main/view")
+    public List<AImage> mainView() {
+        return aImageService.findMainView();
+    }
+
 
     @ApiOperation("图片上传")
     @PostMapping("/upload")

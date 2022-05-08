@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * <p>
@@ -31,6 +32,11 @@ public class AImageServiceImpl
     MinioProperties properties;
     @Resource
     AImageMapper aImageMapper;
+
+    @Override
+    public List<AImage> findMainView() {
+        return aImageMapper.selectList(null);
+    }
 
     @Override
     public void uploadFileAndDb(MultipartFile multipartFile) {

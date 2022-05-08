@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * <p>
@@ -15,6 +16,11 @@ import java.io.InputStream;
  * @since 2021-11-13
  */
 public interface AImageService extends IService<AImage> {
+
+    /**
+     * 查询全部的图片
+     */
+    List<AImage> findMainView();
 
     /**
      * 上传图片
@@ -38,4 +44,5 @@ public interface AImageService extends IService<AImage> {
      * @param id
      */
     void delete(Long id);
+
 }

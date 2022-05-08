@@ -1,6 +1,5 @@
 server:
   port: 9920
-
 spring:
   datasource:
     username: root
@@ -12,6 +11,6 @@ minio:
   #  endpoint: http://182.42.116.193
   endpoint: http://192.168.1.4
   port: 9000
-  accessKey: minioadmin
-  secretKey: minioadmin
+  accessKey: admin
+  secretKey: anzhen3531
   bucket: wallhaven-photo

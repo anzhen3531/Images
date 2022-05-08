@@ -7,6 +7,7 @@ import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -28,6 +29,11 @@ import java.util.UUID;
 @Component
 @Slf4j
 public class AdvanceImage {
+
+    /**
+     * 爬取的网站基础前缀
+     */
+    static final String basePath = "https://wallhaven.cc/hot?page=";
 
     /**
      * 创建默认大小的缓冲区
@@ -57,16 +63,30 @@ public class AdvanceImage {
     }
 
     /**
+     * 开始爬虫任务
+     */
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void scheduledTask() {
+        log.info("定时任务执行");
+        try {
+            getThumbnail(basePath + 1);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    /**
      * 获取缩略图List
      *
-     * @param path 网址路径
+     * @param path : 文件路径
+     * @throws Exception
      */
     public void getThumbnail(String path) throws Exception {
         document = Jsoup.connect(path).headers(headers).get();
-        System.out.println("解析文件成功");
+        log.info("解析文件成功");
         // 获取首页标签的缩略图
         List<String> tagThumbnail = getIndexImage("thumb-listing-page");
-        System.out.println("获取图片选择器成功");
+        log.info("获取图片选择器成功");
         for (String s : tagThumbnail) {
             // 代码优化 使用异步写入文件
             List<String> photoPath = getPhotoPath(Jsoup.connect(s).headers(headers).get());
@@ -139,7 +159,6 @@ public class AdvanceImage {
         return list;
     }
 
-
     /**
      * 写入到本地文件
      */
@@ -193,8 +212,8 @@ public class AdvanceImage {
         inputStream.close();
         buffer.clear();
         long endTime = System.currentTimeMillis();
-        System.out.println("写入完成 ！！！！");
-        System.out.println("耗时为:" + (endTime - startTime) / 1000);
+        log.info("写入完成 ！！！！");
+        log.info("耗时为:" + (endTime - startTime) / 1000);
     }
 
     /**
@@ -204,11 +223,14 @@ public class AdvanceImage {
         if (StringUtil.isBlank(path)) {
             return;
         }
+        long startTime = System.currentTimeMillis();
         // 打开url 流
         URLConnection urlConnection = new URL(path).openConnection();
         InputStream inputStream = urlConnection.getInputStream();
         String suffix = path.substring(path.lastIndexOf("."));
         // 使用流去写入文件
         aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength());
+        log.info("写入完成 ！！！！");
+        log.info("耗时为:" + (System.currentTimeMillis() - startTime) / 1000);
     }
 }
