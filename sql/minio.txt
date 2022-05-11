@@ -1,0 +1,15 @@
+minio 使用docker 构建脚本
+docker pull minio/minio
+
+docker run
+
+docker run -p 9000:9000 -p 9001:9001 --name minio
+-e "MINIO_ROOT_USER=root" -e "MINIO_ROOT_PASSWORD=root123456"
+-v /mydata/minio/data:/data -v /mydata/minio/config:/root/.minio
+-d minio/minio server /data --console-address ":9001"
+
+命令解释 ：
+-p 端口映射
+--name 指定名称
+-v 挂载数据卷
+--console-address 指定控制台地址

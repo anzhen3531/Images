@@ -35,7 +35,6 @@ public class AImageController {
         return aImageService.findMainView();
     }
 
-
     @ApiOperation("图片上传")
     @PostMapping("/upload")
     public String photoUpload() throws Exception {
