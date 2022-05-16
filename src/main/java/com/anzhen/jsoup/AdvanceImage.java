@@ -53,8 +53,8 @@ public class AdvanceImage {
      */
     static Document document;
 
-    // 封装请求头
     static {
+        // 封装请求头
         headers.put("Referer", "https://wallhaven.cc/");
         headers.put("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
         headers.put("sec-ch-ua-mobile", "?0");
@@ -117,8 +117,7 @@ public class AdvanceImage {
                 Elements a = element1.getElementsByTag("a");
                 for (Element element2 : a) {
                     String href = element2.attr("href");
-                    if (!href.isBlank() && !href.isEmpty())
-                        hrefs.add(href);
+                    if (!href.isBlank() && !href.isEmpty()) hrefs.add(href);
                 }
             }
         }
@@ -169,11 +168,9 @@ public class AdvanceImage {
         long startTime = System.currentTimeMillis();
         // 打开url 流
         InputStream inputStream = new URL(path).openStream();
-        try (FileOutputStream fileOutputStream =
-                     new FileOutputStream("D:\\Files\\" + UUID.randomUUID() + ".jpg")) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream("D:\\Files\\" + UUID.randomUUID() + ".jpg")) {
             int temp;
-            while ((temp = inputStream.read()) != -1)
-                fileOutputStream.write(temp);
+            while ((temp = inputStream.read()) != -1) fileOutputStream.write(temp);
         }
         long endTime = System.currentTimeMillis();
         System.out.println("写入完成 ！！！！");
