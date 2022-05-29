@@ -32,7 +32,7 @@ public class AccountLoginController {
     @GetMapping("/auto/login")
     public void autoLogin(@RequestParam("code") String code, @RequestParam("state") String state) {
         Map<String, String> map = new HashMap<>();
-        // 统一封装成为 github 自动登录
+        // 统一封装成为 github 自动登录 分装ch
         map.put("client_id", "1c5c71a9fc77bea14869");
         map.put("client_secret", "26d3bee4fa42c7544f118774154176dc8679bbb0");
         map.put("state", state);

@@ -4,12 +4,18 @@ spring:
   datasource:
     username: root
     password: anzhen3531
-    url: jdbc:mysql://3306/imageprodect?useUnicode=true&characterEncoding=utf8
+    url: jdbc:mysql://localhost:3306/imageprodect?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false
     driver-class-name: com.mysql.jdbc.Driver
+  redis:
+    host: 120.26.48.34
+    database: 0
+    port: 6379
+
 # minio 参数配置
 
 # 26d3bee4fa42c7544f118774154176dc8679bbb0 密钥
 # 1c5c71a9fc77bea14869 client账号
+
 
 minio:
   endpoint: http://127.0.0.1

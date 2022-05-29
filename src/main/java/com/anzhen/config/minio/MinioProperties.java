@@ -1,4 +1,4 @@
-package com.anzhen.config;
+package com.anzhen.config.minio;
 
 
 import org.springframework.boot.context.properties.ConfigurationProperties;

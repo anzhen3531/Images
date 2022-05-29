@@ -1,6 +1,6 @@
 package com.anzhen.service.impl;
 
-import com.anzhen.config.MinioProperties;
+import com.anzhen.config.minio.MinioProperties;
 import com.anzhen.entity.AImage;
 import com.anzhen.mapper.AImageMapper;
 import com.anzhen.service.FileUploadService;

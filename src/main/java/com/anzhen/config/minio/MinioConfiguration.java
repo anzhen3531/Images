@@ -1,4 +1,4 @@
-package com.anzhen.config;
+package com.anzhen.config.minio;
 
 import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Autowired;
