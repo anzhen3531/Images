@@ -7,6 +7,10 @@ spring:
     url: jdbc:mysql://3306/imageprodect?useUnicode=true&characterEncoding=utf8
     driver-class-name: com.mysql.jdbc.Driver
 # minio 参数配置
+
+# 26d3bee4fa42c7544f118774154176dc8679bbb0 密钥
+# 1c5c71a9fc77bea14869 client账号
+
 minio:
   endpoint: http://127.0.0.1
   #  endpoint: http://120.26.48.34
