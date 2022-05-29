@@ -2,8 +2,14 @@ package com.anzhen.common.form;
 
 public class UserForm {
 
+    /**
+     * 用户名
+     */
     String username;
 
+    /**
+     * 密码
+     */
     String password;
 
     public String getUsername() {
