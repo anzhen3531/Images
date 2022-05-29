@@ -8,7 +8,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
   redis:
     host: 120.26.48.34
-    database: 0
+    database: 1
     port: 6379
 
 # minio 参数配置

@@ -18,6 +18,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        // todo  编写登录逻辑类
         // 通过name查询用户是否存在
         System.out.println(s);
         // 不存在则抛出异常
