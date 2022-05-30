@@ -1,10 +1,13 @@
 package com.anzhen.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.anzhen.entity.AUser;
+import com.anzhen.service.AUserService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -14,17 +17,14 @@ import java.util.List;
 public class UserDetailServiceImpl implements UserDetailsService {
 
     @Resource
-    PasswordEncoder passwordEncoder;
+    AUserService aUserService;
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        // todo  编写登录逻辑类
-        // 通过name查询用户是否存在
-        System.out.println(s);
-        // 不存在则抛出异常
-        // 对比密码
-        // 存在则进行设置对象
-        // 设置权限之后进行返回
-        return new User("anzhen", passwordEncoder.encode("123456"), List.of());
+        AUser aUser = aUserService.findByUsername(s);
+        if (ObjectUtil.isNull(aUser) || !s.equals(aUser.getUsername())) {
+            throw new UsernameNotFoundException("账号密码错误");
+        }
+        return new User(aUser.getUsername(), aUser.getPassword(), List.of(new SimpleGrantedAuthority("Role_Image")));
     }
 }

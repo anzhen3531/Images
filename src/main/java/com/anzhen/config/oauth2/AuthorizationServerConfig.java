@@ -1,7 +1,7 @@
 package com.anzhen.config.oauth2;
 
+import com.anzhen.config.oauth2.github.GitHubTokenGranter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,11 +11,15 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
+import org.springframework.security.oauth2.provider.CompositeTokenGranter;
+import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 配置认证服务器
@@ -33,12 +37,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
-//
-//    @Bean
-//    public TokenEndpoint tokenEndpoint() {
-//        return new TokenEndpoint();
-//    }
-
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         // 使用数据库存储Client认证信息
@@ -52,9 +50,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 // 开启/oauth/token_key验证端口认证权限访问
                 .tokenKeyAccess("isAuthenticated()")
                 //  开启/oauth/check_token验证端口认证权限访问
-                .checkTokenAccess("isAuthenticated()")
-                //允许表单认证 在授权码模式下会导致无法根据code获取token&emsp;
-                .allowFormAuthenticationForClients();
+                .checkTokenAccess("isAuthenticated()");
     }
 
     /**
@@ -62,10 +58,20 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
-        endpoints.
-                authenticationManager(authenticationManager).
-                userDetailsService(userDetailsService).
-                tokenStore(tokenStore);
+        // 获取原有默认授权模式(授权码模式、密码模式、客户端模式、简化模式)的授权者
+        List<TokenGranter> granterList = new ArrayList<>(List.of(endpoints.getTokenGranter()));
+        // 添加github授权模式的授权者
+        granterList.add(
+                new GitHubTokenGranter(
+                        endpoints.getTokenServices(),
+                        endpoints.getClientDetailsService(),
+                        endpoints.getOAuth2RequestFactory(),
+                        authenticationManager));
+        CompositeTokenGranter compositeTokenGranter = new CompositeTokenGranter(granterList);
+        endpoints
+                .authenticationManager(authenticationManager)
+                .tokenGranter(compositeTokenGranter)
+                .tokenStore(tokenStore);
     }
 
 }

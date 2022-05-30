@@ -22,9 +22,9 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
         //状态
-        resources.stateless(true)
-                .accessDeniedHandler(authExceptionHandler)
-                .authenticationEntryPoint(authExceptionHandler);
+//        resources.stateless(true)
+//                .accessDeniedHandler(authExceptionHandler)
+//                .authenticationEntryPoint(authExceptionHandler);
         //设置token存储
         resources.tokenStore(redisTokenStore);
     }
@@ -35,13 +35,7 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
         //请求权限配置
         http.authorizeRequests()
                 //下边的路径放行,不需要经过认证
-                .antMatchers("/actuator/health", "/oauth/**", "/account/**", "/user/**").permitAll()
-                .antMatchers("/v2/api-docs", "/swagger-resources/configuration/ui",
-                        "/swagger-resources", "/swagger-resources/configuration/security",
-                        "/swagger-ui.html", "/webjars/**").permitAll()
-                //其余接口没有角色限制，但需要经过认证，只要携带token就可以放行
-                .antMatchers("/dictionary/**").permitAll()
-                .anyRequest()
-                .authenticated();
+                .antMatchers("/account/**", "/user/**", "/oauth/login").permitAll()
+                .anyRequest().authenticated();
     }
 }

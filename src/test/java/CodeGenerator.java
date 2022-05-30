@@ -14,6 +14,5 @@ import java.util.List;
 @SpringBootTest
 public class CodeGenerator {
     public static void main(String[] args) {
-
     }
 }
