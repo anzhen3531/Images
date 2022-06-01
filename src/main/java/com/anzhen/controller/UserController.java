@@ -17,6 +17,11 @@ public class UserController {
     @Resource
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * 查询用户详情
+     *
+     * @return
+     */
     @GetMapping("/info")
     public UserInfo findUserInfo() {
         System.out.println(passwordEncoder.encode("123456"));
