@@ -70,6 +70,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         CompositeTokenGranter compositeTokenGranter = new CompositeTokenGranter(granterList);
         endpoints
                 .authenticationManager(authenticationManager)
+                .userDetailsService(userDetailsService)
                 .tokenGranter(compositeTokenGranter)
                 .tokenStore(tokenStore);
     }
