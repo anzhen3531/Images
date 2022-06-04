@@ -35,3 +35,25 @@ CREATE TABLE `imageprodect`.`a_user` (
                                        `updated_time` DATETIME NULL,
                                        PRIMARY KEY (`id`));
 
+
+
+CREATE TABLE `imageprodect`.`a_role_user` (
+                                              `id` INT NOT NULL AUTO_INCREMENT,
+                                              `role_id` INT NULL,
+                                              `user_id` INT NULL,
+                                              PRIMARY KEY (`id`));
+
+
+CREATE TABLE `imageprodect`.`a_role` (
+                                         `id` INT NOT NULL AUTO_INCREMENT,
+                                         `role_name` VARCHAR(32) NULL,
+                                         `permission` VARCHAR(32) NULL,
+                                         `state` TINYINT NULL,
+                                         PRIMARY KEY (`id`))
+    COMMENT = '角色表';
+
+
+
+INSERT INTO `imageprodect`.`a_role` (`id`, `role_name`, `state`, `permission`) VALUES ('1', '图片管理员', '1', 'ROLE_IMAGE');
+INSERT INTO `imageprodect`.`a_role` (`id`, `role_name`, `state`, `permission`) VALUES ('2', '用户管理员', '1', 'ROLE_USER');
+
