@@ -1,6 +1,7 @@
 package com.anzhen.service;
 
 import com.anzhen.entity.AImage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +17,9 @@ import java.util.List;
  * @since 2021-11-13
  */
 public interface AImageService extends IService<AImage> {
+
+
+    Page<AImage> mainView(Integer currentPage, Integer size);
 
     /**
      * 查询全部的图片

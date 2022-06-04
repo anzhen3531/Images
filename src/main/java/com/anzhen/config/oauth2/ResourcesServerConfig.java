@@ -38,6 +38,6 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
         //请求权限配置
         http.authorizeRequests()
                 //下边的路径放行,不需要经过认证
-                .antMatchers("/account/**", "/user/**", "/oauth/login").permitAll().anyRequest().authenticated();
+                .antMatchers("/account/**", "/user/**", "/oauth/login", "/image/main/view").permitAll().anyRequest().authenticated();
     }
 }

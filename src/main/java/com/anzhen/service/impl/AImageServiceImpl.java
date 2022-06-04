@@ -5,6 +5,7 @@ import com.anzhen.entity.AImage;
 import com.anzhen.mapper.AImageMapper;
 import com.anzhen.service.FileUploadService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,15 @@ public class AImageServiceImpl
     MinioProperties properties;
     @Resource
     AImageMapper aImageMapper;
+
+    @Override
+    public Page<AImage> mainView(Integer currentPage, Integer size) {
+        Page<AImage> page = new Page<>(currentPage, size);
+        QueryWrapper<AImage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("state", 1);
+        return aImageMapper.selectPage(page, queryWrapper);
+
+    }
 
     @Override
     public List<AImage> findMainView() {

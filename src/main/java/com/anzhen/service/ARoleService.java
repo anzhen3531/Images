@@ -1,4 +1,7 @@
 package com.anzhen.service;
 
-public interface ARoleService {
+import com.anzhen.entity.ARole;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+public interface ARoleService extends IService<ARole> {
 }

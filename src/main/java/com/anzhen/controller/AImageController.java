@@ -6,13 +6,13 @@ import com.anzhen.common.result.ApiResult;
 import com.anzhen.entity.AImage;
 import com.anzhen.jsoup.JobImage;
 import com.anzhen.service.AImageService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * <p>
@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Api(tags = "后端图片接口")
 @RestController
-@RequestMapping("/a-image")
+@RequestMapping("/image")
 public class AImageController {
 
     @Resource
@@ -34,8 +34,8 @@ public class AImageController {
 
     @ApiOperation("分页图片查询")
     @GetMapping("/main/view")
-    public List<AImage> mainView() {
-        return aImageService.findMainView();
+    public ApiResult<Page<AImage>> mainView(@RequestParam("page") Integer page, @RequestParam("size") Integer size) {
+        return ApiResult.success(aImageService.mainView(page, size));
     }
 
     @ApiOperation("图片上传")
