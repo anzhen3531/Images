@@ -38,11 +38,13 @@ public class AUserServiceImpl extends ServiceImpl<AUserMapper, AUser> implements
         List<Integer> roleIds = CollectionUtil.isEmpty(aRoleUserList) ?
                 List.of() :
                 aRoleUserList.stream().map(ARoleUser::getRoleId).toList();
-        List<ARole> aRoles = aRoleService.listByIds(roleIds);
+        List<ARole> aRoles = CollectionUtil.isEmpty(roleIds) ?
+                List.of() :
+                aRoleService.listByIds(roleIds);
         UserInfo userInfo = new UserInfo();
         userInfo.setAUser(aUser);
         userInfo.setRoleList(aRoles);
-        return null;
+        return userInfo;
     }
 
     @Override

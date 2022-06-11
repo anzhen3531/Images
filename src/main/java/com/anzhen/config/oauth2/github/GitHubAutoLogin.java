@@ -22,12 +22,13 @@ public class GitHubAutoLogin {
 
     public AUser getGitHubUsernameByCode(String code) {
         Map<String, String> map = new HashMap<>();
-        // 统一封装成为 github 自动登录 分装ch
+        // 统一封装成为 github 自动登录 分装ch  todo 从配置文件中获取  等会改一下
         map.put("client_id", "1c5c71a9fc77bea14869");
         map.put("client_secret", "26d3bee4fa42c7544f118774154176dc8679bbb0");
         map.put("state", "image");
         map.put("code", code);
-        map.put("redirect_uri", "http://localhost:9920/account/auto/login");
+        // 应该配置成为配置文件
+        map.put("redirect_uri", "http://localhost:8080/image/home");
         // 获取token
         Map resp = restTemplate.postForObject("https://github.com/login/oauth/access_token", map, Map.class);
         System.out.println(resp);

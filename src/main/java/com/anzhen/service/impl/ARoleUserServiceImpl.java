@@ -1,5 +1,6 @@
 package com.anzhen.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.anzhen.common.result.CommonState;
 import com.anzhen.entity.ARoleUser;
 import com.anzhen.mapper.ARoleUserMapper;
@@ -18,9 +19,11 @@ public class ARoleUserServiceImpl extends ServiceImpl<ARoleUserMapper, ARoleUser
 
     @Override
     public List<ARoleUser> findRoleUserByUserId(Integer id) {
+        if (ObjectUtil.isNull(id)) {
+            return List.of();
+        }
         QueryWrapper<ARoleUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", id);
-        queryWrapper.eq("state", CommonState.state);
         return aroleUserMapper.selectList(queryWrapper);
     }
 

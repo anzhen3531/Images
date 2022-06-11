@@ -17,6 +17,8 @@ import org.springframework.web.client.RestTemplate;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+
     /**
      * 认证管理对象
      *
