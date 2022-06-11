@@ -1,5 +1,7 @@
 package com.anzhen.common.form;
 
+import java.util.List;
+
 public class UserUpdateForm {
 
     /**
@@ -15,13 +17,13 @@ public class UserUpdateForm {
     /**
      * 角色标签
      */
-    String role;
+    List<Integer> role;
 
-    public String getRole() {
+    public List<Integer> getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(List<Integer> role) {
         this.role = role;
     }
 

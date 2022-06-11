@@ -4,6 +4,8 @@ import com.anzhen.common.info.UserInfo;
 import com.anzhen.entity.AUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 
 public interface AUserService extends IService<AUser> {
 
@@ -32,8 +34,27 @@ public interface AUserService extends IService<AUser> {
      */
     AUser findByUsername(String username);
 
+    /**
+     * 创建用户
+     *
+     * @param aUser
+     */
     void create(AUser aUser);
 
+    /**
+     * 修改用户和权限
+     *
+     * @param user
+     * @param role
+     * @return
+     */
+    Boolean updateAndPermission(AUser user, List<Integer> role);
+
+    /**
+     * 删除用户 软删除
+     *
+     * @param user
+     */
     void delete(AUser user);
 
 }

@@ -23,4 +23,11 @@ public class ARoleUserServiceImpl extends ServiceImpl<ARoleUserMapper, ARoleUser
         queryWrapper.eq("state", CommonState.state);
         return aroleUserMapper.selectList(queryWrapper);
     }
+
+    @Override
+    public void deleteByUserId(Integer id) {
+        QueryWrapper<ARoleUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", id);
+        aroleUserMapper.delete(queryWrapper);
+    }
 }

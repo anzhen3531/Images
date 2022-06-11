@@ -1,5 +1,6 @@
 package com.anzhen.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.anzhen.common.form.UserForm;
 import com.anzhen.common.form.UserUpdateForm;
@@ -9,6 +10,7 @@ import com.anzhen.common.result.ApiResultCode;
 import com.anzhen.entity.AUser;
 import com.anzhen.service.AUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.helper.StringUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -62,17 +64,27 @@ public class UserController {
      * 修改用户信息
      */
     @PutMapping("/{id}")
-    public ApiResult<Void> update(@RequestBody UserUpdateForm userUpdateForm,
-                                  @PathVariable("id") Long id) {
+    public ApiResult<Void> update(@RequestBody UserUpdateForm userUpdateForm, @PathVariable("id") Long id) {
         AUser user = aUserService.findById(id);
         if (ObjectUtil.isNull(user)) {
             return ApiResult.failed(ApiResultCode.USER_NOT_EXIST);
         }
-        // 修改用户名
-        aUserService.update();
-        // 修改权限  可以通过 之前删除之前关联的信息  删除之后重新插入
-        // 附带修改权限
-        return ApiResult.success();
+        // 判断传递的是否是空值
+        if (!StringUtil.isBlank(userUpdateForm.getUsername())) {
+            user.setName(userUpdateForm.getUsername());
+        }
+        if (!StringUtil.isBlank(userUpdateForm.getPassword())) {
+            user.setPassword(userUpdateForm.getPassword());
+        }
+
+        boolean flag = CollectionUtil.isEmpty(userUpdateForm.getRole()) ?
+                aUserService.updateById(user) :
+                aUserService.updateAndPermission(user, userUpdateForm.getRole());
+        if (flag) {
+            return ApiResult.success();
+        } else {
+            return ApiResult.failed("修改失败");
+        }
     }
 
     /**

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AUserServiceImpl extends ServiceImpl<AUserMapper, AUser> implements AUserService {
@@ -66,6 +67,24 @@ public class AUserServiceImpl extends ServiceImpl<AUserMapper, AUser> implements
         // 设置状态为默认开启状态
         aUser.setState(CommonState.state);
         aUserMapper.insert(aUser);
+    }
+
+    @Override
+    public Boolean updateAndPermission(AUser user, List<Integer> roleIds) {
+        // 先修改用户
+        aUserMapper.updateById(user);
+        // 删除之前的权限关联关系
+        aRoleUserService.deleteByUserId(user.getId());
+        // 创建用户和角色关联关系
+        List<ARoleUser> aRoleUserList = roleIds.stream().map(roleId -> {
+            ARoleUser aRoleUser = new ARoleUser();
+            aRoleUser.setRoleId(roleId);
+            aRoleUser.setUserId(user.getId());
+            return aRoleUser;
+        }).collect(Collectors.toList());
+        // 创建用户权限
+        aRoleUserService.saveBatch(aRoleUserList);
+        return false;
     }
 
     @Override
