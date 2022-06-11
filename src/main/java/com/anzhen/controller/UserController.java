@@ -9,8 +9,10 @@ import com.anzhen.common.result.ApiResult;
 import com.anzhen.common.result.ApiResultCode;
 import com.anzhen.entity.AUser;
 import com.anzhen.service.AUserService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.helper.StringUtil;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -29,6 +31,8 @@ public class UserController {
      * @return
      */
     @GetMapping("/info/{id}")
+    @ApiOperation("查询用户详情")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ApiResult<UserInfo> findUserInfo(@PathVariable("id") Long id) {
         UserInfo userInfo = aUserService.findInfoById(id);
         if (ObjectUtil.isEmpty(userInfo)) {
@@ -44,6 +48,8 @@ public class UserController {
      * @return
      */
     @PostMapping("")
+    @ApiOperation("用户注册")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ApiResult<Void> create(@RequestBody UserForm userForm) {
         // 验证是否存在相同的用户名
         String username = userForm.getUsername();
@@ -64,6 +70,8 @@ public class UserController {
      * 修改用户信息
      */
     @PutMapping("/{id}")
+    @ApiOperation("修改用户信息")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ApiResult<Void> update(@RequestBody UserUpdateForm userUpdateForm, @PathVariable("id") Long id) {
         AUser user = aUserService.findById(id);
         if (ObjectUtil.isNull(user)) {
@@ -93,6 +101,8 @@ public class UserController {
      * @return
      */
     @DeleteMapping("/{id}")
+    @ApiOperation("删除用户")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ApiResult<Void> delete(@PathVariable("id") Long id) {
         // 对用户进行归档
         AUser user = aUserService.findById(id);

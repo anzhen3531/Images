@@ -5,9 +5,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
-/**
- * @date 2020-06-23
- **/
 @AllArgsConstructor
 @NoArgsConstructor
 public enum ApiResultCode implements IApiResultCode, Serializable {

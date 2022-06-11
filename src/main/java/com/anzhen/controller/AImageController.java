@@ -46,8 +46,8 @@ public class AImageController {
         return ApiResult.success();
     }
 
-    @ApiOperation("删除图片")
     @PutMapping("/{id}")
+    @ApiOperation("删除图片")
     @PreAuthorize("hasRole('ROLE_IMAGE')")
     public ApiResult<Void> audit(@PathVariable("id") Long id) {
         // 先查询id是否存在
