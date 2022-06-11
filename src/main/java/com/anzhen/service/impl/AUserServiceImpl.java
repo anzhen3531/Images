@@ -1,7 +1,14 @@
 package com.anzhen.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.anzhen.common.info.UserInfo;
+import com.anzhen.common.result.CommonState;
+import com.anzhen.entity.ARole;
+import com.anzhen.entity.ARoleUser;
 import com.anzhen.entity.AUser;
 import com.anzhen.mapper.AUserMapper;
+import com.anzhen.service.ARoleService;
+import com.anzhen.service.ARoleUserService;
 import com.anzhen.service.AUserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 public class AUserServiceImpl extends ServiceImpl<AUserMapper, AUser> implements AUserService {
@@ -16,12 +24,39 @@ public class AUserServiceImpl extends ServiceImpl<AUserMapper, AUser> implements
     @Resource
     AUserMapper aUserMapper;
     @Resource
+    ARoleUserService aRoleUserService;
+    @Resource
+    ARoleService aRoleService;
+    @Resource
     PasswordEncoder passwordEncoder;
+
+    @Override
+    public UserInfo findInfoById(Long id) {
+        AUser aUser = aUserMapper.selectById(id);
+        List<ARoleUser> aRoleUserList = aRoleUserService.findRoleUserByUserId(aUser.getId());
+        List<Integer> roleIds = CollectionUtil.isEmpty(aRoleUserList) ?
+                List.of() :
+                aRoleUserList.stream().map(ARoleUser::getRoleId).toList();
+        List<ARole> aRoles = aRoleService.listByIds(roleIds);
+        UserInfo userInfo = new UserInfo();
+        userInfo.setAUser(aUser);
+        userInfo.setRoleList(aRoles);
+        return null;
+    }
+
+    @Override
+    public AUser findById(Long id) {
+        QueryWrapper<AUser> aUserQueryWrapper = new QueryWrapper<>();
+        aUserQueryWrapper.eq("id", id);
+        aUserQueryWrapper.eq("state", CommonState.state);
+        return aUserMapper.selectOne(aUserQueryWrapper);
+    }
 
     @Override
     public AUser findByUsername(String username) {
         QueryWrapper<AUser> aUserQueryWrapper = new QueryWrapper<>();
         aUserQueryWrapper.eq("username", username);
+        aUserQueryWrapper.eq("state", CommonState.state);
         return aUserMapper.selectOne(aUserQueryWrapper);
     }
 
@@ -29,7 +64,12 @@ public class AUserServiceImpl extends ServiceImpl<AUserMapper, AUser> implements
     public void create(AUser aUser) {
         aUser.setPassword(passwordEncoder.encode("123456"));
         // 设置状态为默认开启状态
-        aUser.setState(1);
+        aUser.setState(CommonState.state);
         aUserMapper.insert(aUser);
+    }
+
+    @Override
+    public void delete(AUser user) {
+        aUserMapper.updateById(user);
     }
 }
