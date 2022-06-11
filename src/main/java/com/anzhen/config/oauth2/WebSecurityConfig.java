@@ -17,10 +17,6 @@ import org.springframework.web.client.RestTemplate;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-//    @Resource
-//    PasswordProvider provider;
-
     /**
      * 认证管理对象
      *
@@ -43,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers(
                 "/v2/api-docs",
                 "/swagger-resources/configuration/ui",
