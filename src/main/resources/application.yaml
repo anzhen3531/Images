@@ -30,3 +30,9 @@ minio:
   accessKey: root
   secretKey: root123456
   bucket: wallhaven-photo
+
+github:
+  clientId: 1c5c71a9fc77bea14869
+  clientSecret: 26d3bee4fa42c7544f118774154176dc8679bbb0
+  redirectUri: http://localhost:8080/image/home
+

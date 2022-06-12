@@ -2,6 +2,7 @@ package com.anzhen.config.oauth2.github;
 
 import com.anzhen.entity.AUser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,22 +16,25 @@ import java.util.Map;
 
 @Component
 @Slf4j
+@EnableConfigurationProperties({GithubProperties.class})
 public class GitHubAutoLogin {
-
+    private static final String GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token";
     @Resource
     RestTemplate restTemplate;
+    @Resource
+    GithubProperties githubProperties;
 
     public AUser getGitHubUsernameByCode(String code) {
         Map<String, String> map = new HashMap<>();
-        // 统一封装成为 github 自动登录 分装ch  todo 从配置文件中获取  等会改一下
-        map.put("client_id", "1c5c71a9fc77bea14869");
-        map.put("client_secret", "26d3bee4fa42c7544f118774154176dc8679bbb0");
+        // 统一封装成为github登录
+        map.put("client_id", githubProperties.getClientId());
+        map.put("client_secret", githubProperties.getClientSecret());
         map.put("state", "image");
         map.put("code", code);
         // 应该配置成为配置文件
-        map.put("redirect_uri", "http://localhost:8080/image/home");
+        map.put("redirect_uri", githubProperties.getRedirectUri());
         // 获取token
-        Map resp = restTemplate.postForObject("https://github.com/login/oauth/access_token", map, Map.class);
+        Map resp = restTemplate.postForObject(GITHUB_TOKEN_URL, map, Map.class);
         System.out.println(resp);
         HttpHeaders httpheaders = new HttpHeaders();
         httpheaders.add("Authorization", "token " + resp.get("access_token"));
