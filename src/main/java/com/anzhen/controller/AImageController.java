@@ -43,7 +43,7 @@ public class AImageController {
     @ApiOperation("图片上传")
     @PostMapping("/upload")
     @PreAuthorize("hasRole('ROLE_IMAGE')")
-    public ApiResult<Void> photoUpload(MultipartFile file) throws Exception {
+    public ApiResult<Void> photoUpload(MultipartFile file) {
         // 接收文件 进行上传
         aImageService.uploadFileAndDb(file);
         return ApiResult.success();
