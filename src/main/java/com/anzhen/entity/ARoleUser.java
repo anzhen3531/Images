@@ -14,15 +14,15 @@ import lombok.experimental.Accessors;
 public class ARoleUser {
 
     @TableId(type = IdType.AUTO)
-    Integer id;
+    Long id;
 
     /**
      * 用户id
      */
-    Integer userId;
+    Long userId;
 
     /**
      * 角色id
      */
-    Integer roleId;
+    Long roleId;
 }

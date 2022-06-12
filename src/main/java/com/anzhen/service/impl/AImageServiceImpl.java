@@ -1,7 +1,10 @@
 package com.anzhen.service.impl;
 
+import com.anzhen.common.context.AUserContextHolder;
+import com.anzhen.common.result.CommonState;
 import com.anzhen.config.minio.MinioProperties;
 import com.anzhen.entity.AImage;
+import com.anzhen.entity.AUser;
 import com.anzhen.mapper.AImageMapper;
 import com.anzhen.service.FileUploadService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -12,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -23,9 +27,7 @@ import java.util.List;
  * @since 2021-11-13
  */
 @Service
-public class AImageServiceImpl
-        extends ServiceImpl<AImageMapper, AImage>
-        implements com.anzhen.service.AImageService {
+public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage> implements com.anzhen.service.AImageService {
 
     @Resource
     FileUploadService fileUploadService;
@@ -38,7 +40,7 @@ public class AImageServiceImpl
     public Page<AImage> mainView(Integer currentPage, Integer size) {
         Page<AImage> page = new Page<>(currentPage, size);
         QueryWrapper<AImage> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("state", 1);
+        queryWrapper.eq("state", CommonState.state);
         return aImageMapper.selectPage(page, queryWrapper);
 
     }
@@ -51,10 +53,13 @@ public class AImageServiceImpl
     @Override
     public void uploadFileAndDb(MultipartFile multipartFile) {
         fileUploadService.fileUpload(properties.getBucket(), multipartFile);
+        AUser aUser = AUserContextHolder.getAUserContext().getaUser();
         String fileUrl = multipartFile.getOriginalFilename();
-        // 将文件设置进去数据库
         AImage aImage = new AImage();
+        aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());
         aImage.setImagePath(fileUrl);
+        aImage.setCreatedBy(aUser.getId());
+        aImage.setCreatedTime(LocalDateTime.now());
         aImageMapper.insert(aImage);
     }
 
@@ -64,8 +69,8 @@ public class AImageServiceImpl
         // 将文件设置进去数据库
         AImage aImage = new AImage();
         // 设置默认属性
-        aImage.setImageId("pc" + System.currentTimeMillis());
-        aImage.setState(1);
+        aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());
+        aImage.setState(CommonState.state);
         aImage.setImagePath(filePath);
         aImageMapper.insert(aImage);
     }

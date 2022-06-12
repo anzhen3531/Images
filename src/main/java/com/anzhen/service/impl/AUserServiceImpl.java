@@ -35,7 +35,7 @@ public class AUserServiceImpl extends ServiceImpl<AUserMapper, AUser> implements
     public UserInfo findInfoById(Long id) {
         AUser aUser = aUserMapper.selectById(id);
         List<ARoleUser> aRoleUserList = aRoleUserService.findRoleUserByUserId(aUser.getId());
-        List<Integer> roleIds = CollectionUtil.isEmpty(aRoleUserList) ?
+        List<Long> roleIds = CollectionUtil.isEmpty(aRoleUserList) ?
                 List.of() :
                 aRoleUserList.stream().map(ARoleUser::getRoleId).toList();
         List<ARole> aRoles = CollectionUtil.isEmpty(roleIds) ?
@@ -72,7 +72,7 @@ public class AUserServiceImpl extends ServiceImpl<AUserMapper, AUser> implements
     }
 
     @Override
-    public Boolean updateAndPermission(AUser user, List<Integer> roleIds) {
+    public Boolean updateAndPermission(AUser user, List<Long> roleIds) {
         // 先修改用户
         aUserMapper.updateById(user);
         // 删除之前的权限关联关系

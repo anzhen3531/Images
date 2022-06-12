@@ -1,6 +1,7 @@
 package com.anzhen.controller;
 
 
+import cn.hutool.core.net.multipart.MultipartFormData;
 import cn.hutool.core.util.ObjectUtil;
 import com.anzhen.common.result.ApiResult;
 import com.anzhen.entity.AImage;
@@ -11,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
@@ -41,8 +43,9 @@ public class AImageController {
     @ApiOperation("图片上传")
     @PostMapping("/upload")
     @PreAuthorize("hasRole('ROLE_IMAGE')")
-    public ApiResult<Void> photoUpload() throws Exception {
-        jobImage.execute();
+    public ApiResult<Void> photoUpload(MultipartFile file) throws Exception {
+        // 接收文件 进行上传
+        aImageService.uploadFileAndDb(file);
         return ApiResult.success();
     }
 

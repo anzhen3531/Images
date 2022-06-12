@@ -48,7 +48,7 @@ public interface AUserService extends IService<AUser> {
      * @param role
      * @return
      */
-    Boolean updateAndPermission(AUser user, List<Integer> role);
+    Boolean updateAndPermission(AUser user, List<Long> role);
 
     /**
      * 删除用户 软删除

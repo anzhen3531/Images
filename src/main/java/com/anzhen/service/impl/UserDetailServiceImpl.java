@@ -2,6 +2,7 @@ package com.anzhen.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.anzhen.common.result.CommonState;
 import com.anzhen.entity.ARole;
 import com.anzhen.entity.ARoleUser;
 import com.anzhen.entity.AUser;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,16 +40,27 @@ public class UserDetailServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("账号密码错误");
         }
 
-        // 查找权限
-        List<ARoleUser> aRoleUserList = aRoleUserService.listByIds(List.of(aUser.getId()));
-        List<ARole> aRoles = List.of();
-        if (CollectionUtil.isNotEmpty(aRoleUserList)) {
-            List<Integer> aRoleIds = aRoleUserList.stream().map(ARoleUser::getRoleId).collect(Collectors.toList());
-            aRoles = aRoleService.listByIds(aRoleIds);
+        List<GrantedAuthority> permissionList = new ArrayList<>();
+        if (CommonState.USER_ADMIN.equals(s)) {
+            // 直接授予全部权限 例如ROLE_IMAGE  ROLE_USER
+            permissionList.add(new SimpleGrantedAuthority(CommonState.ROLE_USER));
+            permissionList.add(new SimpleGrantedAuthority(CommonState.ROLE_IMAGE));
+        } else {
+
+            // 查找权限
+            List<ARoleUser> aRoleUserList = aRoleUserService.listByIds(List.of(aUser.getId()));
+            List<ARole> aRoles = List.of();
+            if (CollectionUtil.isNotEmpty(aRoleUserList)) {
+                List<Long> aRoleIds = aRoleUserList.stream().map(ARoleUser::getRoleId).collect(Collectors.toList());
+                aRoles = aRoleService.listByIds(aRoleIds);
+            }
+            // 授予权限
+            permissionList = CollectionUtil.isEmpty(aRoles) ?
+                    List.of() :
+                    aRoles.stream().map(aRole -> new SimpleGrantedAuthority(aRole.getPermission())).collect(Collectors.toList());
         }
 
         // 查找权限
-        List<GrantedAuthority> permissionList = CollectionUtil.isEmpty(aRoles) ? List.of() : aRoles.stream().map(aRole -> new SimpleGrantedAuthority(aRole.getPermission())).collect(Collectors.toList());
         return new User(aUser.getUsername(), aUser.getPassword(), permissionList);
     }
 }

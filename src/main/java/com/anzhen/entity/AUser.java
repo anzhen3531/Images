@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class AUser {
 
     @TableId(type = IdType.AUTO)
-    Integer id;
+    Long id;
     String username;
     String password;
     String name;

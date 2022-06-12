@@ -17,13 +17,13 @@ public class UserUpdateForm {
     /**
      * 角色标签
      */
-    List<Integer> role;
+    List<Long> role;
 
-    public List<Integer> getRole() {
+    public List<Long> getRole() {
         return role;
     }
 
-    public void setRole(List<Integer> role) {
+    public void setRole(List<Long> role) {
         this.role = role;
     }
 

@@ -1,6 +1,8 @@
-package com.anzhen.common;
+package com.anzhen.config.oauth2.filter;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.anzhen.common.context.AUserContext;
+import com.anzhen.common.context.AUserContextHolder;
 import com.anzhen.entity.AUser;
 import com.anzhen.service.AUserService;
 import lombok.extern.slf4j.Slf4j;

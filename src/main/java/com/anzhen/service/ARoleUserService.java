@@ -12,10 +12,10 @@ public interface ARoleUserService extends IService<ARoleUser> {
      * @param id
      * @return
      */
-    List<ARoleUser> findRoleUserByUserId(Integer id);
+    List<ARoleUser> findRoleUserByUserId(Long id);
 
     /**
      * 通过用户id删除角色和用户关联关系
      */
-    void deleteByUserId(Integer id);
+    void deleteByUserId(Long id);
 }
