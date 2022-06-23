@@ -12,7 +12,7 @@ public class GithubProperties {
 
     private String clientSecret;
 
-    private String redirectUri;
+        private String redirectUri;
 
     public String getClientId() {
         return clientId;
