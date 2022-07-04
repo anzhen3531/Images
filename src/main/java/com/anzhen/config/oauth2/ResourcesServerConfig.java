@@ -3,6 +3,7 @@ package com.anzhen.config.oauth2;
 import com.anzhen.config.oauth2.handle.AuthExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -26,9 +27,7 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
         //状态
-        resources.stateless(true)
-                .accessDeniedHandler(authExceptionHandler)
-                .authenticationEntryPoint(authExceptionHandler);
+        resources.stateless(true).accessDeniedHandler(authExceptionHandler).authenticationEntryPoint(authExceptionHandler);
         //设置token存储
         resources.tokenStore(redisTokenStore);
     }
@@ -39,10 +38,10 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
         //请求权限配置
         http.authorizeRequests()
                 //下边的路径放行,不需要经过认证
-                .antMatchers("/account/**",
-                        "/user/**",
-                        "/oauth/login",
-                        "/image/main/view").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers("/account/**", "/user/**", "/image/main/view")
+                .permitAll().antMatchers(HttpMethod.OPTIONS, "/oauth/**")
+                .permitAll()
+                .anyRequest().authenticated()
+                .and().cors().and().csrf().disable();
     }
 }
