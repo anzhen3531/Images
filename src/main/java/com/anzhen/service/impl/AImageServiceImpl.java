@@ -41,6 +41,7 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage> impleme
         Page<AImage> page = new Page<>(currentPage, size);
         QueryWrapper<AImage> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("state", CommonState.state);
+        queryWrapper.orderByDesc("update_time");
         return aImageMapper.selectPage(page, queryWrapper);
 
     }
