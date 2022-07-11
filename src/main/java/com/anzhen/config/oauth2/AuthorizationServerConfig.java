@@ -20,58 +20,54 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 配置认证服务器
- */
+/** 配置认证服务器 */
 @Configuration
 @EnableAuthorizationServer
 @RequiredArgsConstructor
 // 需要全部参数构造
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-    private final DataSource dataSource;
-    @Resource(name = "tokenStore")
-    private TokenStore tokenStore;
-    private final UserDetailsService userDetailsService;
-    private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
+  private final DataSource dataSource;
 
-    @Override
-    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        // 使用数据库存储Client认证信息
-        clients.jdbc(dataSource).passwordEncoder(passwordEncoder);
-    }
+  @Resource(name = "tokenStore")
+  private TokenStore tokenStore;
 
+  private final UserDetailsService userDetailsService;
+  private final AuthenticationManager authenticationManager;
+  private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) {
-        security
-                // 开启/oauth/token_key验证端口认证权限访问
-                .tokenKeyAccess("isAuthenticated()")
-                //  开启/oauth/check_token验证端口认证权限访问
-                .checkTokenAccess("isAuthenticated()");
-    }
+  @Override
+  public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+    // 使用数据库存储Client认证信息
+    clients.jdbc(dataSource).passwordEncoder(passwordEncoder);
+  }
 
-    /**
-     * 配置授权（authorization）以及令牌（token）的访问端点和令牌服务(token services)
-     */
-    @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
-        // 获取原有默认授权模式(授权码模式、密码模式、客户端模式、简化模式)的授权者
-        List<TokenGranter> granterList = new ArrayList<>(List.of(endpoints.getTokenGranter()));
-        // 添加github授权模式的授权者
-        granterList.add(
-                new GitHubTokenGranter(
-                        endpoints.getTokenServices(),
-                        endpoints.getClientDetailsService(),
-                        endpoints.getOAuth2RequestFactory(),
-                        authenticationManager));
-        CompositeTokenGranter compositeTokenGranter = new CompositeTokenGranter(granterList);
-        endpoints
-                .authenticationManager(authenticationManager)
-                .userDetailsService(userDetailsService)
-                .tokenGranter(compositeTokenGranter)
-                .tokenStore(tokenStore);
-    }
+  @Override
+  public void configure(AuthorizationServerSecurityConfigurer security) {
+    security
+        // 开启/oauth/token_key验证端口认证权限访问
+        .tokenKeyAccess("isAuthenticated()")
+        //  开启/oauth/check_token验证端口认证权限访问
+        .checkTokenAccess("isAuthenticated()");
+  }
 
+  /** 配置授权（authorization）以及令牌（token）的访问端点和令牌服务(token services) */
+  @Override
+  public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
+    // 获取原有默认授权模式(授权码模式、密码模式、客户端模式、简化模式)的授权者
+    List<TokenGranter> granterList = new ArrayList<>(List.of(endpoints.getTokenGranter()));
+    // 添加github授权模式的授权者
+    granterList.add(
+        new GitHubTokenGranter(
+            endpoints.getTokenServices(),
+            endpoints.getClientDetailsService(),
+            endpoints.getOAuth2RequestFactory(),
+            authenticationManager));
+    CompositeTokenGranter compositeTokenGranter = new CompositeTokenGranter(granterList);
+    endpoints
+        .authenticationManager(authenticationManager)
+        .userDetailsService(userDetailsService)
+        .tokenGranter(compositeTokenGranter)
+        .tokenStore(tokenStore);
+  }
 }

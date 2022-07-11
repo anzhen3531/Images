@@ -1,18 +1,16 @@
 package com.anzhen.entity;
 
-import java.time.LocalDateTime;
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 /**
- * <p>
  * 数据库图片存储表
- * </p>
  *
  * @author anzhen
  * @since 2021-11-13
@@ -23,24 +21,21 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "AImage对象", description = "数据库图片存储表")
 public class AImage implements Serializable {
 
-    @TableId
-    private Long id;
+  @TableId private Long id;
 
-    private String imageId;
+  private String imageId;
 
-    private String imageTag;
+  private String imageTag;
 
-    private String imagePath;
+  private String imagePath;
 
-    private Integer state;
+  private Integer state;
 
-    private Long createdBy;
+  private Long createdBy;
 
-    private LocalDateTime createdTime;
+  private LocalDateTime createdTime;
 
-    private Long updateBy;
+  private Long updateBy;
 
-    private LocalDateTime updateTime;
-
-
+  private LocalDateTime updateTime;
 }

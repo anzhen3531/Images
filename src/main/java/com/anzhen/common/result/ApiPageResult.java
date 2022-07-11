@@ -14,32 +14,30 @@ import java.util.List;
 @Data
 public class ApiPageResult<T> implements Serializable {
 
-    private String code;
+  private String code;
 
-    private Data data;
+  private Data data;
 
-    private String msg;
+  private String msg;
 
-    public static <T> ApiPageResult<T> success(IPage<T> page) {
-        ApiPageResult<T> result = new ApiPageResult<>();
-        result.setCode(ApiResultCode.SUCCESS.getCode());
+  public static <T> ApiPageResult<T> success(IPage<T> page) {
+    ApiPageResult<T> result = new ApiPageResult<>();
+    result.setCode(ApiResultCode.SUCCESS.getCode());
 
-        Data data = new Data<T>();
-        data.setList(page.getRecords());
-        data.setTotal(page.getTotal());
+    Data data = new Data<T>();
+    data.setList(page.getRecords());
+    data.setTotal(page.getTotal());
 
-        result.setData(data);
-        result.setMsg(ApiResultCode.SUCCESS.getMsg());
-        return result;
-    }
+    result.setData(data);
+    result.setMsg(ApiResultCode.SUCCESS.getMsg());
+    return result;
+  }
 
-    @lombok.Data
-    public static class Data<T> {
+  @lombok.Data
+  public static class Data<T> {
 
-        private List<T> list;
+    private List<T> list;
 
-        private long total;
-
-    }
-
+    private long total;
+  }
 }

@@ -22,72 +22,72 @@ import javax.annotation.Resource;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Resource
-    private UserDetailsService userDetailsService;
-    /**
-     * 认证管理对象
-     *
-     * @return
-     * @throws Exception
-     */
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+  @Resource private UserDetailsService userDetailsService;
+  /**
+   * 认证管理对象
+   *
+   * @return
+   * @throws Exception
+   */
+  @Bean
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers(
-                "/v2/api-docs",
-                "/swagger-resources/configuration/ui",
-                "/swagger-resources",
-                "/swagger-resources/configuration/security",
-                "/swagger-ui.html",
-                "/webjars/**");
-    }
+  @Override
+  public void configure(WebSecurity web) {
+    web.ignoring()
+        .antMatchers(
+            "/v2/api-docs",
+            "/swagger-resources/configuration/ui",
+            "/swagger-resources",
+            "/swagger-resources/configuration/security",
+            "/swagger-ui.html#",
+            "/webjars/**");
+  }
 
-    /**
-     * 添加provider 配置
-     *
-     * @param auth
-     */
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(gitHubAuthenticationProvider());
-        auth.authenticationProvider(daoAuthenticationProvider());
-    }
+  /**
+   * 添加provider 配置
+   *
+   * @param auth
+   */
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) {
+    auth.authenticationProvider(gitHubAuthenticationProvider());
+    auth.authenticationProvider(daoAuthenticationProvider());
+  }
 
-    /**
-     * 用户名密码认证授权提供者
-     *
-     * @return
-     */
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        provider.setHideUserNotFoundExceptions(false); // 是否隐藏用户不存在异常，默认:true-隐藏；false-抛出异常；
-        return provider;
-    }
+  /**
+   * 用户名密码认证授权提供者
+   *
+   * @return
+   */
+  @Bean
+  public DaoAuthenticationProvider daoAuthenticationProvider() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setUserDetailsService(userDetailsService);
+    provider.setPasswordEncoder(passwordEncoder());
+    provider.setHideUserNotFoundExceptions(false); // 是否隐藏用户不存在异常，默认:true-隐藏；false-抛出异常；
+    return provider;
+  }
 
-    /**
-     * 微信认证授权提供者
-     *
-     * @return
-     */
-    @Bean
-    public GitHubAuthenticationProvider gitHubAuthenticationProvider() {
-        return new GitHubAuthenticationProvider();
-    }
+  /**
+   * 微信认证授权提供者
+   *
+   * @return
+   */
+  @Bean
+  public GitHubAuthenticationProvider gitHubAuthenticationProvider() {
+    return new GitHubAuthenticationProvider();
+  }
 }

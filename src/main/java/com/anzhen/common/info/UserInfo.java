@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class UserInfo {
 
-    private AUser aUser;
+  private AUser aUser;
 
-    private List<ARole> roleList;
+  private List<ARole> roleList;
 }

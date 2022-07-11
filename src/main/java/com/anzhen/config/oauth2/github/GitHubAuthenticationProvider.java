@@ -15,50 +15,47 @@ import java.util.HashSet;
 
 public class GitHubAuthenticationProvider implements AuthenticationProvider {
 
-    @Resource
-    GitHubAutoLogin gitHubAutoLogin;
-    @Resource
-    AUserService aUserService;
-    @Resource
-    UserDetailsService userDetailsService;
+  @Resource GitHubAutoLogin gitHubAutoLogin;
+  @Resource AUserService aUserService;
+  @Resource UserDetailsService userDetailsService;
 
-    /**
-     * 自定义github 授权码认证方式
-     *
-     * @param authentication the authentication request object.
-     * @return
-     * @throws AuthenticationException
-     */
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        // 获取code
-        GithubAuthenticationToken authenticationToken = (GithubAuthenticationToken) authentication;
-        String code = (String) authenticationToken.getPrincipal();
+  /**
+   * 自定义github 授权码认证方式
+   *
+   * @param authentication the authentication request object.
+   * @return
+   * @throws AuthenticationException
+   */
+  @Override
+  public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    // 获取code
+    GithubAuthenticationToken authenticationToken = (GithubAuthenticationToken) authentication;
+    String code = (String) authenticationToken.getPrincipal();
 
-        // 编写github 登录sdk  直接调用即可
-        AUser aUser = gitHubAutoLogin.getGitHubUsernameByCode(code);
-        if (ObjectUtil.isNotNull(aUser)) {
-            AUser userByName = aUserService.findByUsername(aUser.getUsername());
-            if (ObjectUtil.isNull(userByName)) {
-                aUserService.create(aUser);
-            }
-        } else {
-            throw new UsernameNotFoundException("没有查找到账号");
-        }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(aUser.getUsername());
-        GithubAuthenticationToken result = new GithubAuthenticationToken(userDetails, new HashSet<>());
-        result.setDetails(authentication.getDetails());
-        return result;
+    // 编写github 登录sdk  直接调用即可
+    AUser aUser = gitHubAutoLogin.getGitHubUsernameByCode(code);
+    if (ObjectUtil.isNotNull(aUser)) {
+      AUser userByName = aUserService.findByUsername(aUser.getUsername());
+      if (ObjectUtil.isNull(userByName)) {
+        aUserService.create(aUser);
+      }
+    } else {
+      throw new UsernameNotFoundException("没有查找到账号");
     }
+    UserDetails userDetails = userDetailsService.loadUserByUsername(aUser.getUsername());
+    GithubAuthenticationToken result = new GithubAuthenticationToken(userDetails, new HashSet<>());
+    result.setDetails(authentication.getDetails());
+    return result;
+  }
 
-    /**
-     * 支持什么方式
-     *
-     * @param authentication
-     * @return
-     */
-    @Override
-    public boolean supports(Class<?> authentication) {
-        return GithubAuthenticationToken.class.isAssignableFrom(authentication);
-    }
+  /**
+   * 支持什么方式
+   *
+   * @param authentication
+   * @return
+   */
+  @Override
+  public boolean supports(Class<?> authentication) {
+    return GithubAuthenticationToken.class.isAssignableFrom(authentication);
+  }
 }

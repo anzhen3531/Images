@@ -13,16 +13,12 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "AROLEUSER", description = "用户表")
 public class ARoleUser {
 
-    @TableId(type = IdType.AUTO)
-    Long id;
+  @TableId(type = IdType.AUTO)
+  Long id;
 
-    /**
-     * 用户id
-     */
-    Long userId;
+  /** 用户id */
+  Long userId;
 
-    /**
-     * 角色id
-     */
-    Long roleId;
+  /** 角色id */
+  Long roleId;
 }
