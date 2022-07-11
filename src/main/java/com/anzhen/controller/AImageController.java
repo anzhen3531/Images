@@ -25,7 +25,6 @@ import javax.annotation.Resource;
 public class AImageController {
 
   @Resource AImageService aImageService;
-  @Resource JobImage jobImage;
 
   @ApiOperation("分页图片查询")
   @GetMapping("/main/view")
