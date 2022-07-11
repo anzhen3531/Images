@@ -50,7 +50,7 @@ public class AUserContextFilter extends OncePerRequestFilter {
         aUserContext.setaUser(aUser);
         AUserContextHolder.setAUserContext(aUserContext);
       }
-      filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
+    filterChain.doFilter(httpServletRequest, httpServletResponse);
   }
 }

@@ -13,9 +13,12 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+
+
 logging:
   level:
     com.anzhen.mapper: DEBUG
+    root: INFO
 # minio 参数配置
 
 # 26d3bee4fa42c7544f118774154176dc8679bbb0 密钥

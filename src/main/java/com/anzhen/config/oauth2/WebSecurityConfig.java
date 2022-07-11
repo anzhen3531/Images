@@ -1,6 +1,5 @@
 package com.anzhen.config.oauth2;
 
-import com.anzhen.config.CorsConfig;
 import com.anzhen.config.oauth2.github.GitHubAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,13 +7,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -25,7 +23,6 @@ import javax.annotation.Resource;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Resource private UserDetailsService userDetailsService;
-  @Resource private CorsConfig config;
   /**
    * 认证管理对象
    *
@@ -82,22 +79,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     return new GitHubAuthenticationProvider();
   }
 
+  // 静态资源配置
   @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    // 请求权限配置
-    http.authorizeRequests()
-        // 下边的路径放行,不需要经过认证
-        .antMatchers("/account/**", "/user/**", "/image/main/*", "/oauth/**")
-        .permitAll()
-        .antMatchers("/webjars/**", "/doc.html", "/swagger-resources/**", "/v2/api-docs")
-        .permitAll()
-        .anyRequest()
-        .authenticated()
-        .and()
-        .cors()
-        .and()
-        .csrf()
-        .disable()
-        .addFilterBefore(config, WebAsyncManagerIntegrationFilter.class);
+  public void configure(WebSecurity web) {
+    // swagger2所需要用到的静态资源，允许访问
+    web.ignoring()
+        .antMatchers(
+            "/public/**",
+            "/oauth/public/**",
+            "/webjars/**",
+            "webjars/springfox-swagger-ui/**",
+            "webjars/springfox-swagger-ui",
+            "/configuration/**",
+            "/swagger-ui.html",
+            "/static/**",
+            "/v2/api-docs**",
+            "/swagger-resources/**");
   }
 }
