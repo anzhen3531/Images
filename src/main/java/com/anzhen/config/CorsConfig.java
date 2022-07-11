@@ -1,5 +1,7 @@
 package com.anzhen.config;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -9,6 +11,7 @@ import java.util.List;
 
 /** 跨域配置 */
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsConfig extends org.springframework.web.filter.CorsFilter {
   public CorsConfig() {
     super(configurationSource());
