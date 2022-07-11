@@ -1,5 +1,6 @@
 package com.anzhen.config.oauth2;
 
+import com.anzhen.config.CorsConfig;
 import com.anzhen.config.oauth2.handle.AuthExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 
 /** 资源服务器配置 */
 @Configuration
@@ -21,6 +23,7 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
 
   private final RedisTokenStore redisTokenStore;
   private final AuthExceptionHandler authExceptionHandler;
+  private final CorsConfig config;
 
   @Override
   public void configure(ResourceServerSecurityConfigurer resources) {
@@ -48,6 +51,7 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
         .cors()
         .and()
         .csrf()
-        .disable();
+        .disable()
+        .addFilterBefore(config, WebAsyncManagerIntegrationFilter.class);
   }
 }
