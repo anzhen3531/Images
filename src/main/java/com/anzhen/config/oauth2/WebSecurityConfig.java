@@ -1,5 +1,6 @@
 package com.anzhen.config.oauth2;
 
+import com.anzhen.config.CorsConfig;
 import com.anzhen.config.oauth2.github.GitHubAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,12 +8,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -23,6 +25,7 @@ import javax.annotation.Resource;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Resource private UserDetailsService userDetailsService;
+  @Resource private CorsConfig config;
   /**
    * 认证管理对象
    *
@@ -42,18 +45,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
-  }
-
-  @Override
-  public void configure(WebSecurity web) {
-    web.ignoring()
-        .antMatchers(
-            "/v2/api-docs",
-            "/swagger-resources/configuration/ui",
-            "/swagger-resources",
-            "/swagger-resources/configuration/security",
-            "/swagger-ui.html#",
-            "/webjars/**");
   }
 
   /**
@@ -89,5 +80,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public GitHubAuthenticationProvider gitHubAuthenticationProvider() {
     return new GitHubAuthenticationProvider();
+  }
+
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    // 请求权限配置
+    http.authorizeRequests()
+        // 下边的路径放行,不需要经过认证
+        .antMatchers("/account/**", "/user/**", "/image/main/*", "/oauth/**")
+        .permitAll()
+        .antMatchers("/webjars/**", "/doc.html", "/swagger-resources/**", "/v2/api-docs")
+        .permitAll()
+        .anyRequest()
+        .authenticated()
+        .and()
+        .cors()
+        .and()
+        .csrf()
+        .disable()
+        .addFilterBefore(config, WebAsyncManagerIntegrationFilter.class);
   }
 }

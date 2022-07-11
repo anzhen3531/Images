@@ -38,7 +38,7 @@ public class CorsConfig extends org.springframework.web.filter.CorsFilter {
             "Authorization",
             "authorization");
     List<String> allowedMethods = Arrays.asList("POST", "GET", "DELETE", "PUT", "OPTIONS");
-    List<String> allowedOrigins = Arrays.asList("*");
+    List<String> allowedOrigins = List.of("*");
     corsConfig.setAllowedHeaders(allowedHeaders);
     corsConfig.setAllowedMethods(allowedMethods);
     corsConfig.setAllowedOrigins(allowedOrigins);
