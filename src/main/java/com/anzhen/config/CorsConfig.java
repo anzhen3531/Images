@@ -41,7 +41,7 @@ public class CorsConfig extends org.springframework.web.filter.CorsFilter {
     List<String> allowedOrigins = List.of("*");
     corsConfig.setAllowedHeaders(allowedHeaders);
     corsConfig.setAllowedMethods(allowedMethods);
-    corsConfig.setAllowedOrigins(allowedOrigins);
+    corsConfig.setAllowedOriginPatterns(allowedOrigins);
     corsConfig.setExposedHeaders(exposedHeaders);
     corsConfig.setMaxAge(36000L);
     corsConfig.setAllowCredentials(true);
