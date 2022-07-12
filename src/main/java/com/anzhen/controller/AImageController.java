@@ -7,6 +7,7 @@ import com.anzhen.service.AImageService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
  * @author anzhen
  * @since 2021-11-13
  */
+@Slf4j
 @Api(tags = "后端图片接口")
 @RestController
 @RequestMapping("/image")

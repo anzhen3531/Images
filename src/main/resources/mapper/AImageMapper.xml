@@ -2,4 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.anzhen.mapper.AImageMapper">
 
+    <select id="mainView" resultType="com.anzhen.entity.AImage" flushCache="true">
+        SELECT *
+        FROM a_image
+        WHERE state = #{state}
+        Order by update_time desc
+    </select>
 </mapper>

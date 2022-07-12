@@ -10,6 +10,7 @@ import com.anzhen.service.FileUploadService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,69 +20,65 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * <p>
  * 数据库图片存储表 服务实现类
- * </p>
  *
  * @author anzhen
  * @since 2021-11-13
  */
 @Service
-public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage> implements com.anzhen.service.AImageService {
+@Slf4j
+public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
+    implements com.anzhen.service.AImageService {
 
-    @Resource
-    FileUploadService fileUploadService;
-    @Resource
-    MinioProperties properties;
-    @Resource
-    AImageMapper aImageMapper;
+  @Resource FileUploadService fileUploadService;
+  @Resource MinioProperties properties;
+  @Resource AImageMapper aImageMapper;
 
-    @Override
-    public Page<AImage> mainView(Integer currentPage, Integer size) {
-        Page<AImage> page = new Page<>(currentPage, size);
-        QueryWrapper<AImage> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("state", CommonState.state);
-        queryWrapper.orderByDesc("update_time");
-        return aImageMapper.selectPage(page, queryWrapper);
+  @Override
+  public Page<AImage> mainView(Integer currentPage, Integer size) {
+    Page<AImage> page = new Page<>(currentPage, size);
+    Page<AImage> aImagePage = aImageMapper.mainView(page, CommonState.state);
+    System.out.println(aImagePage);
+    return aImageMapper.mainView(page, CommonState.state);
+  }
 
-    }
+  @Override
+  public List<AImage> findMainView() {
+    return aImageMapper.selectList(null);
+  }
 
-    @Override
-    public List<AImage> findMainView() {
-        return aImageMapper.selectList(null);
-    }
+  @Override
+  public void uploadFileAndDb(MultipartFile multipartFile) {
+    fileUploadService.fileUpload(properties.getBucket(), multipartFile);
+    AUser aUser = AUserContextHolder.getAUserContext().getaUser();
+    String fileUrl = multipartFile.getOriginalFilename();
+    AImage aImage = new AImage();
+    aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());
+    aImage.setImagePath(fileUrl);
+    aImage.setCreatedBy(aUser.getId());
+    aImage.setCreatedTime(LocalDateTime.now());
+    aImageMapper.insert(aImage);
+  }
 
-    @Override
-    public void uploadFileAndDb(MultipartFile multipartFile) {
-        fileUploadService.fileUpload(properties.getBucket(), multipartFile);
-        AUser aUser = AUserContextHolder.getAUserContext().getaUser();
-        String fileUrl = multipartFile.getOriginalFilename();
-        AImage aImage = new AImage();
-        aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());
-        aImage.setImagePath(fileUrl);
-        aImage.setCreatedBy(aUser.getId());
-        aImage.setCreatedTime(LocalDateTime.now());
-        aImageMapper.insert(aImage);
-    }
+  @Override
+  public void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize)
+      throws Exception {
+    fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream, objectSize);
+    // 将文件设置进去数据库
+    AImage aImage = new AImage();
+    // 设置默认属性
+    aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());
+    aImage.setState(CommonState.state);
+    aImage.setImagePath(filePath);
+    aImageMapper.insert(aImage);
+  }
 
-    @Override
-    public void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize) throws Exception {
-        fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream, objectSize);
-        // 将文件设置进去数据库
-        AImage aImage = new AImage();
-        // 设置默认属性
-        aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());
-        aImage.setState(CommonState.state);
-        aImage.setImagePath(filePath);
-        aImageMapper.insert(aImage);
-    }
-
-    @Override
-    public void delete(Long id) {
-        QueryWrapper<AImage> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", id);
-        AImage aImage = aImageMapper.selectOne(queryWrapper);
-        fileUploadService.delFile(properties.getBucket(), aImage.getImagePath());
-        aImageMapper.deleteById(id);
-    }
+  @Override
+  public void delete(Long id) {
+    QueryWrapper<AImage> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq("id", id);
+    AImage aImage = aImageMapper.selectOne(queryWrapper);
+    fileUploadService.delFile(properties.getBucket(), aImage.getImagePath());
+    aImageMapper.deleteById(id);
+  }
 }
