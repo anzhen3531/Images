@@ -9,14 +9,12 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class CORSConfiguration {
-
   @Bean
   public FilterRegistrationBean corsFilter() {
-
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);
-    config.addAllowedOrigin("*");
+    config.addAllowedOriginPattern("*");
     config.addAllowedHeader("*");
     config.addAllowedMethod("*");
     // 设置跨域缓存实践为30分钟
