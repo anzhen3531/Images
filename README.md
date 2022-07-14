@@ -6,4 +6,4 @@ SpringBoot
 
 MyBatis Plus  数据层
 
-MinIO   云存储
+MinIO   对象存储
