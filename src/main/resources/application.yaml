@@ -13,8 +13,6 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
-
-
 logging:
   level:
     com.anzhen.mapper: DEBUG
@@ -22,7 +20,6 @@ logging:
 
 # 26d3bee4fa42c7544f118774154176dc8679bbb0 密钥
 # 1c5c71a9fc77bea14869 client账号
-
 
 minio:
   #  endpoint: http://127.0.0.1
