@@ -31,7 +31,6 @@ public class UserController {
    */
   @GetMapping("/info/{id}")
   @ApiOperation("查询用户详情")
-  @PreAuthorize("hasRole('ROLE_USER')")
   public ApiResult<UserInfo> findUserInfo(@PathVariable("id") Long id) {
     UserInfo userInfo = aUserService.findInfoById(id);
     if (ObjectUtil.isEmpty(userInfo)) {

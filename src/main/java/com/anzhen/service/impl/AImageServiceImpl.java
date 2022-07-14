@@ -1,5 +1,6 @@
 package com.anzhen.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.anzhen.common.context.AUserContextHolder;
 import com.anzhen.common.result.CommonState;
 import com.anzhen.config.minio.MinioProperties;
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,8 +51,14 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
 
   @Override
   public void uploadFileAndDb(MultipartFile multipartFile) {
-    fileUploadService.fileUpload(properties.getBucket(), multipartFile);
+    // 获取当前登录的用户
     AUser aUser = AUserContextHolder.getAUserContext().getaUser();
+    // 如果用户没有登录则不进行上传
+    if (ObjectUtil.isNull(aUser)) {
+      throw new BadCredentialsException("用户未登录");
+    }
+    // 上传文件到MinIO
+    fileUploadService.fileUpload(properties.getBucket(), multipartFile);
     String fileUrl = multipartFile.getOriginalFilename();
     AImage aImage = new AImage();
     aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());

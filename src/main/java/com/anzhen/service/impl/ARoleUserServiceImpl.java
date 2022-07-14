@@ -12,24 +12,24 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @Service
-public class ARoleUserServiceImpl extends ServiceImpl<ARoleUserMapper, ARoleUser> implements ARoleUserService {
-    @Resource
-    ARoleUserMapper aroleUserMapper;
+public class ARoleUserServiceImpl extends ServiceImpl<ARoleUserMapper, ARoleUser>
+    implements ARoleUserService {
+  @Resource ARoleUserMapper aroleUserMapper;
 
-    @Override
-    public List<ARoleUser> findRoleUserByUserId(Long id) {
-        if (ObjectUtil.isNull(id)) {
-            return List.of();
-        }
-        QueryWrapper<ARoleUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", id);
-        return aroleUserMapper.selectList(queryWrapper);
+  @Override
+  public List<ARoleUser> findRoleUserByUserId(Long id) {
+    if (ObjectUtil.isNull(id)) {
+      return List.of();
     }
+    QueryWrapper<ARoleUser> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq("user_id", id);
+    return aroleUserMapper.selectList(queryWrapper);
+  }
 
-    @Override
-    public void deleteByUserId(Long id) {
-        QueryWrapper<ARoleUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", id);
-        aroleUserMapper.delete(queryWrapper);
-    }
+  @Override
+  public void deleteByUserId(Long id) {
+    QueryWrapper<ARoleUser> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq("user_id", id);
+    aroleUserMapper.delete(queryWrapper);
+  }
 }

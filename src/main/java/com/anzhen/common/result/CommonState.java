@@ -11,4 +11,5 @@ public interface CommonState {
   String ROLE_IMAGE = "ROLE_IMAGE";
 
   String PC_UPLOAD = "pc";
+  Long ADMIN_ID = 0L;
 }
