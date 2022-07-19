@@ -29,8 +29,6 @@ public class AuthExceptionHandler implements AuthenticationEntryPoint, AccessDen
     Throwable cause = authException.getCause();
     response.setContentType("application/json;charset=UTF-8");
     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    // CORS "pre-flight" request
-    response.addHeader("Access-Control-Allow-Origin", "*");
     response.addHeader("Cache-Control", "no-cache");
     response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     response.setHeader("Access-Control-Allow-Headers", "x-requested-with");
@@ -58,7 +56,6 @@ public class AuthExceptionHandler implements AuthenticationEntryPoint, AccessDen
       throws IOException, ServletException {
     response.setContentType("application/json;charset=UTF-8");
     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    response.addHeader("Access-Control-Allow-Origin", "*");
     response.addHeader("Cache-Control", "no-cache");
     response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     response.setHeader("Access-Control-Allow-Headers", "x-requested-with");
