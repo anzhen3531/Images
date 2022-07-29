@@ -56,7 +56,7 @@ public class AdvanceImage {
   }
 
   /** 开始爬虫任务 */
-  @Scheduled(cron = "0 0 0 * * ?")
+  @Scheduled(cron = "0 0 8-10 * * ?")
   public void scheduledTask() {
     log.info("定时任务执行");
     try {
