@@ -11,6 +11,5 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * @since 2021-11-13
  */
 public interface AImageMapper extends BaseMapper<AImage> {
-
   Page<AImage> mainView(Page<AImage> page, Integer state);
 }

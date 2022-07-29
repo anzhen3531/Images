@@ -29,12 +29,12 @@ public class FileUploadServiceImpl implements FileUploadService {
      * @param file       文件
      */
     @SneakyThrows
-    public void fileUpload(String bucketName, MultipartFile file) {
+    public void fileUpload(String bucketName, MultipartFile file, String filePath) {
         // 构建文件上传对象
         PutObjectArgs objectArgs = PutObjectArgs
                 .builder()
                 .bucket(bucketName)
-                .object(file.getOriginalFilename())
+                .object(filePath)
                 .stream(file.getInputStream(), file.getSize(), -1)
                 .contentType(file.getContentType()).build();
         minioClient.putObject(objectArgs);

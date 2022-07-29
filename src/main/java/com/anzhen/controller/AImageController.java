@@ -1,6 +1,7 @@
 package com.anzhen.controller;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.anzhen.common.exception.BadRequestException;
 import com.anzhen.common.result.ApiResult;
 import com.anzhen.entity.AImage;
 import com.anzhen.service.AImageService;
@@ -38,8 +39,11 @@ public class AImageController {
   @ApiOperation("图片上传")
   @PostMapping("/upload")
   @PreAuthorize("hasRole('ROLE_IMAGE')")
-  public ApiResult<Void> photoUpload(MultipartFile file) {
+  public ApiResult<Void> photoUpload(@RequestPart("file") MultipartFile file) {
     // 接收文件 进行上传
+    if (ObjectUtil.isEmpty(file)) {
+      throw new BadRequestException("文件为空");
+    }
     aImageService.uploadFileAndDb(file);
     return ApiResult.success();
   }

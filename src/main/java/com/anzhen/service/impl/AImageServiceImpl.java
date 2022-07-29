@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 数据库图片存储表 服务实现类
@@ -57,14 +58,19 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
     if (ObjectUtil.isNull(aUser)) {
       throw new BadCredentialsException("用户未登录");
     }
-    // 上传文件到MinIO
-    fileUploadService.fileUpload(properties.getBucket(), multipartFile);
-    String fileUrl = multipartFile.getOriginalFilename();
+
+    // 该文件应该用随机打乱的文件  不应该获取源文件大小
+    String fileName = multipartFile.getOriginalFilename();
+    assert fileName != null;
+    String suffix = fileName.substring(fileName.lastIndexOf("."));
+    String filePath = UUID.randomUUID() + suffix;
     AImage aImage = new AImage();
     aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());
-    aImage.setImagePath(fileUrl);
+    aImage.setImagePath(filePath);
     aImage.setCreatedBy(aUser.getId());
     aImage.setCreatedTime(LocalDateTime.now());
+    // 上传文件到MinIO
+    fileUploadService.fileUpload(properties.getBucket(), multipartFile, filePath);
     aImageMapper.insert(aImage);
   }
 

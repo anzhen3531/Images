@@ -17,7 +17,7 @@ public interface FileUploadService {
      * @param bucketName 同名称
      * @param file       文件
      */
-    void fileUpload(String bucketName, MultipartFile file);
+    void fileUpload(String bucketName, MultipartFile file, String filePath);
 
     /**
      * 文件上传接口

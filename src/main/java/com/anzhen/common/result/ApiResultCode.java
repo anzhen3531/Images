@@ -54,12 +54,6 @@ public enum ApiResultCode implements IApiResultCode, Serializable {
   MIDDLEWARE_SERVICE_ERROR("C0100", "中间件服务出错"),
   INTERFACE_NOT_EXIST("C0113", "接口不存在"),
 
-  MESSAGE_SERVICE_ERROR("C0120", "消息服务出错"),
-  MESSAGE_DELIVERY_ERROR("C0121", "消息投递出错"),
-  MESSAGE_CONSUMPTION_ERROR("C0122", "消息消费出错"),
-  MESSAGE_SUBSCRIPTION_ERROR("C0123", "消息订阅出错"),
-  MESSAGE_GROUP_NOT_FOUND("C0124", "消息分组未查到"),
-
   DATABASE_ERROR("C0300", "数据库服务出错"),
   DATABASE_TABLE_NOT_EXIST("C0311", "表不存在"),
   DATABASE_COLUMN_NOT_EXIST("C0312", "列不存在"),
