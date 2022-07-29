@@ -28,7 +28,7 @@ logging:
 
 
 minio:
-  endpoint: http://127.0.0.1
+  endpoint: http://172.17.0.1
   #  endpoint: http://182.42.116.193
   port: 9000
   accessKey: root

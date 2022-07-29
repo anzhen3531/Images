@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -51,6 +52,7 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void uploadFileAndDb(MultipartFile multipartFile) {
     // 获取当前登录的用户
     AUser aUser = AUserContextHolder.getAUserContext().getaUser();
