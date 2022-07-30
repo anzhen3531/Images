@@ -10,6 +10,8 @@ import com.anzhen.common.info.UserInfo;
 import com.anzhen.common.result.ApiResult;
 import com.anzhen.common.result.ApiResultCode;
 import com.anzhen.entity.AUser;
+import com.anzhen.entity.AUserCollection;
+import com.anzhen.service.AUserCollectionService;
 import com.anzhen.service.AUserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,6 +30,7 @@ public class UserController {
 
   @Resource private AUserService aUserService;
   @Resource private PasswordEncoder passwordEncoder;
+  @Resource private AUserCollectionService aUserCollectionService;
 
   @GetMapping("/info/mine")
   @ApiOperation("查询用户详情")
@@ -47,6 +51,24 @@ public class UserController {
       return ApiResult.success(userInfo);
     }
   }
+
+  @GetMapping("/collection/mine")
+  @ApiOperation("通过用户id查询用户收藏图片")
+  public ApiResult<List<AUserCollection>> findUserCollectionImage() {
+    AUserContext aUserContext = AUserContextHolder.getAUserContext();
+    if (ObjectUtil.isNull(aUserContext)) {
+      return ApiResult.failed("未登录");
+    }
+    AUser aUser = aUserContext.getaUser();
+    if (ObjectUtil.isNull(aUser)) {
+      return ApiResult.failed("未找到该用户");
+    } else {
+      List<AUserCollection> collectionImage =
+          aUserCollectionService.findMineCollectionImage(aUser.getId());
+      return ApiResult.success(collectionImage);
+    }
+  }
+
   /**
    * 查询用户详情
    *
@@ -85,6 +107,30 @@ public class UserController {
     user.setName(userForm.getUsername());
     aUserService.create(user);
     return ApiResult.success();
+  }
+
+  /**
+   * 用户收藏图片
+   *
+   * @param imageId 图片id
+   */
+  @PostMapping("/collection/{imageId}")
+  @ApiOperation("用户收藏图片")
+  public ApiResult<Void> collectionImage(@PathVariable Long imageId) {
+    AUserContext aUserContext = AUserContextHolder.getAUserContext();
+    if (ObjectUtil.isNull(aUserContext)) {
+      return ApiResult.failed("未登录");
+    }
+    AUser aUser = aUserContext.getaUser();
+    if (ObjectUtil.isNull(aUser)) {
+      return ApiResult.failed("未找到该用户");
+    } else {
+      AUserCollection aUserCollection = new AUserCollection();
+      aUserCollection.setUserId(aUser.getId());
+      aUserCollection.setImageId(imageId);
+      aUserCollectionService.save(aUserCollection);
+      return ApiResult.success();
+    }
   }
 
   /** 修改用户信息 */
@@ -131,6 +177,18 @@ public class UserController {
       return ApiResult.failed(ApiResultCode.USER_NOT_EXIST);
     }
     aUserService.delete(user);
+    return ApiResult.success();
+  }
+
+  /**
+   * 删除用户
+   *
+   * @return
+   */
+  @DeleteMapping("/collection/{id}")
+  @ApiOperation("取消收藏")
+  public ApiResult<Void> cancelCollection(@PathVariable("id") Long id) {
+    aUserCollectionService.removeById(id);
     return ApiResult.success();
   }
 }
