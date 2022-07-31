@@ -72,16 +72,16 @@ VALUES ('2', '用户管理员', '1', 'ROLE_USER');
 # 创建用户收藏图片关联表
 CREATE TABLE `a_user_collection`
 (
-    `id`       int NOT NULL AUTO_INCREMENT,
-    `image_id` BIGINT NOT NULL DEFAULT NULL COMMENT '图片id',
-    `user_id`  BIGINT NOT NULL DEFAULT NULL COMMENT '用户id',
+    `id`       int    NOT NULL AUTO_INCREMENT,
+    `image_id` BIGINT NOT NULL COMMENT '图片id',
+    `user_id`  BIGINT NOT NULL COMMENT '用户id',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_bin COMMENT ='用户收藏';
 
 
-CREATE TABLE `imageprodect`.`a_user_back_list`
+CREATE TABLE `a_user_back_list`
 (
     `id`       INT    NOT NULL AUTO_INCREMENT,
     `image_id` BIGINT NOT NULL,
