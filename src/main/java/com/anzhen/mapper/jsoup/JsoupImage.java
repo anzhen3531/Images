@@ -1,4 +1,4 @@
-package com.anzhen.jsoup;
+package com.anzhen.mapper.jsoup;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;

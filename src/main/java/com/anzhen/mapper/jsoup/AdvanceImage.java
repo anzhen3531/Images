@@ -1,6 +1,7 @@
-package com.anzhen.jsoup;
+package com.anzhen.mapper.jsoup;
 
 import com.anzhen.service.AImageService;
+import io.netty.handler.timeout.ReadTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.StringUtil;
@@ -56,11 +57,26 @@ public class AdvanceImage {
   }
 
   /** 开始爬虫任务 */
-  @Scheduled(cron = "0 0 8-10 * * ?")
+  @Scheduled(cron = "0 0 12 * * ?")
   public void scheduledTask() {
     log.info("定时任务执行");
     try {
       getThumbnail(basePath + 1);
+    } catch (ReadTimeoutException e) {
+      log.error(e.getMessage());
+      log.info("由于出现了读取失败的问题 尝试重新运行定时任务  第一次尝试");
+      try {
+        getThumbnail(basePath + 1);
+      } catch (ReadTimeoutException ex) {
+        log.info("由于出现了读取失败的问题 尝试重新运行定时任务  第二次尝试");
+        try {
+          getThumbnail(basePath + 1);
+        } catch (Exception ee) {
+          log.error(ee.getMessage());
+        }
+      } catch (Exception ex) {
+        throw new RuntimeException(ex);
+      }
     } catch (Exception e) {
       log.error(e.getMessage());
     }

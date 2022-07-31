@@ -13,6 +13,7 @@ import com.anzhen.entity.AUser;
 import com.anzhen.entity.AUserCollection;
 import com.anzhen.service.AUserCollectionService;
 import com.anzhen.service.AUserService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.helper.StringUtil;
@@ -185,10 +186,22 @@ public class UserController {
    *
    * @return
    */
-  @DeleteMapping("/collection/{id}")
+  @DeleteMapping("/collection/{imageId}")
   @ApiOperation("取消收藏")
-  public ApiResult<Void> cancelCollection(@PathVariable("id") Long id) {
-    aUserCollectionService.removeById(id);
-    return ApiResult.success();
+  public ApiResult<Void> cancelCollection(@PathVariable("imageId") Long imageId) {
+    AUserContext aUserContext = AUserContextHolder.getAUserContext();
+    if (ObjectUtil.isNull(aUserContext)) {
+      return ApiResult.failed("未登录");
+    }
+    AUser aUser = aUserContext.getaUser();
+    if (ObjectUtil.isNull(aUser)) {
+      return ApiResult.failed("未找到该用户");
+    } else {
+      QueryWrapper<AUserCollection> queryWrapper = new QueryWrapper<>();
+      queryWrapper.eq("image_id", imageId);
+      queryWrapper.eq("user_id", aUser.getId());
+      aUserCollectionService.remove(queryWrapper);
+      return ApiResult.success();
+    }
   }
 }
