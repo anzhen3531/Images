@@ -51,7 +51,7 @@ public class AImageController {
   @PutMapping("/{id}")
   @ApiOperation("删除图片")
   @PreAuthorize("hasRole('ROLE_IMAGE')")
-  public ApiResult<Void> audit(@PathVariable("id") Long id) {
+  public ApiResult<Void> audit(@PathVariable("id") String id) {
     // 先查询id是否存在
     aImageService.delete(id);
     return ApiResult.success();
@@ -61,7 +61,7 @@ public class AImageController {
   @DeleteMapping("/{id}")
   // 需要授予权限
   @PreAuthorize("hasRole('ROLE_IMAGE')")
-  public ApiResult<Void> delete(@PathVariable("id") Long id) {
+  public ApiResult<Void> delete(@PathVariable("id") String id) {
     // 先查询id是否存在
     AImage image = aImageService.getById(id);
     if (ObjectUtil.isNotNull(image)) {

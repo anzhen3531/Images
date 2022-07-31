@@ -5,7 +5,15 @@
     <select id="mainView" resultType="com.anzhen.entity.AImage" flushCache="true">
         SELECT *
         FROM a_image
-        WHERE state = #{state}
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="list != null and list.size > 0" >
+                 id  NOT IN
+                <foreach collection="list" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+           AND  state = #{state}
+        </trim>
         Order by update_time desc
     </select>
 </mapper>

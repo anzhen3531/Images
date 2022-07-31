@@ -47,6 +47,6 @@ public interface AImageService extends IService<AImage> {
      *
      * @param id
      */
-    void delete(Long id);
+    void delete(String id);
 
 }

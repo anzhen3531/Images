@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.ser.std.ToStringSerializer;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -21,7 +23,9 @@ import java.time.LocalDateTime;
 @ApiModel(value = "AImage对象", description = "数据库图片存储表")
 public class AImage implements Serializable {
 
-  @TableId private Long id;
+  @JsonSerialize(using = ToStringSerializer.class)
+  @TableId
+  private String id;
 
   private String imageId;
 

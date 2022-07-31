@@ -16,6 +16,6 @@ public class AUserBackList {
   @TableId(type = IdType.AUTO)
   Integer id;
 
-  Long imageId;
+  String imageId;
   Long userId;
 }

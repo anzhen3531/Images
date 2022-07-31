@@ -10,7 +10,9 @@ import com.anzhen.common.info.UserInfo;
 import com.anzhen.common.result.ApiResult;
 import com.anzhen.common.result.ApiResultCode;
 import com.anzhen.entity.AUser;
+import com.anzhen.entity.AUserBackList;
 import com.anzhen.entity.AUserCollection;
+import com.anzhen.service.AUserBackListService;
 import com.anzhen.service.AUserCollectionService;
 import com.anzhen.service.AUserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -32,6 +34,7 @@ public class UserController {
   @Resource private AUserService aUserService;
   @Resource private PasswordEncoder passwordEncoder;
   @Resource private AUserCollectionService aUserCollectionService;
+  @Resource private AUserBackListService aUserBackListService;
 
   @GetMapping("/info/mine")
   @ApiOperation("查询用户详情")
@@ -117,7 +120,7 @@ public class UserController {
    */
   @PostMapping("/collection/{imageId}")
   @ApiOperation("用户收藏图片")
-  public ApiResult<Void> collectionImage(@PathVariable Long imageId) {
+  public ApiResult<Void> collectionImage(@PathVariable String imageId) {
     AUserContext aUserContext = AUserContextHolder.getAUserContext();
     if (ObjectUtil.isNull(aUserContext)) {
       return ApiResult.failed("未登录");
@@ -130,6 +133,30 @@ public class UserController {
       aUserCollection.setUserId(aUser.getId());
       aUserCollection.setImageId(imageId);
       aUserCollectionService.save(aUserCollection);
+      return ApiResult.success();
+    }
+  }
+
+  /**
+   * 用户添加图片黑名单
+   *
+   * @param imageId 图片id
+   */
+  @PostMapping("/back/list/{imageId}")
+  @ApiOperation("用户添加图片黑名单")
+  public ApiResult<Void> backListImage(@PathVariable String imageId) {
+    AUserContext aUserContext = AUserContextHolder.getAUserContext();
+    if (ObjectUtil.isNull(aUserContext)) {
+      return ApiResult.failed("未登录");
+    }
+    AUser aUser = aUserContext.getaUser();
+    if (ObjectUtil.isNull(aUser)) {
+      return ApiResult.failed("未找到该用户");
+    } else {
+      AUserBackList aUserBackList = new AUserBackList();
+      aUserBackList.setUserId(aUser.getId());
+      aUserBackList.setImageId(imageId);
+      aUserBackListService.save(aUserBackList);
       return ApiResult.success();
     }
   }
@@ -188,7 +215,7 @@ public class UserController {
    */
   @DeleteMapping("/collection/{imageId}")
   @ApiOperation("取消收藏")
-  public ApiResult<Void> cancelCollection(@PathVariable("imageId") Long imageId) {
+  public ApiResult<Void> cancelCollection(@PathVariable("imageId") String imageId) {
     AUserContext aUserContext = AUserContextHolder.getAUserContext();
     if (ObjectUtil.isNull(aUserContext)) {
       return ApiResult.failed("未登录");

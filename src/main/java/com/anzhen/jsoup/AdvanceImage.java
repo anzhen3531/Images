@@ -1,4 +1,4 @@
-package com.anzhen.mapper.jsoup;
+package com.anzhen.jsoup;
 
 import com.anzhen.service.AImageService;
 import io.netty.handler.timeout.ReadTimeoutException;

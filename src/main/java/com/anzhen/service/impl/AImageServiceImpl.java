@@ -1,12 +1,15 @@
 package com.anzhen.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.anzhen.common.context.AUserContext;
 import com.anzhen.common.context.AUserContextHolder;
 import com.anzhen.common.result.CommonState;
 import com.anzhen.config.minio.MinioProperties;
 import com.anzhen.entity.AImage;
 import com.anzhen.entity.AUser;
+import com.anzhen.entity.AUserBackList;
 import com.anzhen.mapper.AImageMapper;
+import com.anzhen.service.AUserBackListService;
 import com.anzhen.service.FileUploadService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -22,6 +25,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * 数据库图片存储表 服务实现类
@@ -37,13 +41,20 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
   @Resource FileUploadService fileUploadService;
   @Resource MinioProperties properties;
   @Resource AImageMapper aImageMapper;
+  @Resource AUserBackListService aUserBackListService;
 
   @Override
   public Page<AImage> mainView(Integer currentPage, Integer size) {
+    AUserContext aUserContext = AUserContextHolder.getAUserContext();
+    List<String> list = List.of();
+    if (ObjectUtil.isNotNull(aUserContext) && ObjectUtil.isNotNull(aUserContext.getaUser())) {
+      // 如果用户登录了  并且以及拉黑了图片的话 应该进行排除这些图片id
+      QueryWrapper<AUserBackList> queryWrapper = new QueryWrapper<>();
+      queryWrapper.eq("user_id", aUserContext.getaUser().getId());
+      list = aUserBackListService.list(queryWrapper).stream().map(AUserBackList::getImageId).collect(Collectors.toList());
+    }
     Page<AImage> page = new Page<>(currentPage, size);
-    Page<AImage> aImagePage = aImageMapper.mainView(page, CommonState.state);
-    System.out.println(aImagePage);
-    return aImageMapper.mainView(page, CommonState.state);
+    return aImageMapper.mainView(page, CommonState.state, list);
   }
 
   @Override
@@ -90,7 +101,7 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
   }
 
   @Override
-  public void delete(Long id) {
+  public void delete(String id) {
     QueryWrapper<AImage> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq("id", id);
     AImage aImage = aImageMapper.selectOne(queryWrapper);
