@@ -33,6 +33,8 @@ public class AImage implements Serializable {
 
   private String imagePath;
 
+  private String thumbnailImagePath;
+
   private Integer state;
 
   private Long createdBy;

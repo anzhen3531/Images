@@ -57,7 +57,7 @@ public class AdvanceImage {
   }
 
   /** 开始爬虫任务 */
-  @Scheduled(cron = "0 0 12 * * ?")
+  @Scheduled(cron = "0 0 10 * * ?")
   public void scheduledTask() {
     log.info("定时任务执行");
     try {
@@ -101,10 +101,6 @@ public class AdvanceImage {
       // 写入本地文件
       // 可以采用线程池
       for (String s1 : photoPath) {
-        // 写入一张17mb的文件 堵塞IO使用时间为33s
-        //                writePhoto(s1);
-        // NIO 使用时间为27s  超过 阻塞IO 6秒时间
-        //                writeNioPhoto(s1);
         writePhotoByMinIO(s1);
       }
     }
@@ -121,6 +117,7 @@ public class AdvanceImage {
     for (Element element : elements) {
       Elements li = element.getElementsByTag("li");
       for (Element element1 : li) {
+        // 获取到A标签之后的内容 保存缩略图
         Elements a = element1.getElementsByTag("a");
         for (Element element2 : a) {
           String href = element2.attr("href");
