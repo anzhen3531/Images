@@ -8,15 +8,16 @@ CREATE DATABASE `imageprodect`;
  */
 CREATE TABLE `a_image`
 (
-    `id`           bigint unsigned NOT NULL AUTO_INCREMENT,
-    `image_id`     varchar(64)   DEFAULT NULL,
-    `image_tag`    varchar(32)   DEFAULT NULL,
-    `image_path`   varchar(1024) DEFAULT NULL,
-    `state`        tinyint       DEFAULT NULL,
-    `created_by`   bigint        DEFAULT NULL,
-    `created_time` datetime      DEFAULT CURRENT_TIMESTAMP,
-    `update_by`    bigint        DEFAULT NULL,
-    `update_time`  datetime      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `id`                   bigint unsigned NOT NULL AUTO_INCREMENT,
+    `image_id`             varchar(64)   DEFAULT NULL,
+    `image_tag`            varchar(32)   DEFAULT NULL,
+    `image_path`           varchar(1024) DEFAULT NULL,
+    `thumbnail_image_path` varchar(1024) DEFAULT NULL,
+    `state`                tinyint       DEFAULT NULL,
+    `created_by`           bigint        DEFAULT NULL,
+    `created_time`         datetime      DEFAULT CURRENT_TIMESTAMP,
+    `update_by`            bigint        DEFAULT NULL,
+    `update_time`          datetime      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1523108141249638402
@@ -27,7 +28,7 @@ CREATE TABLE `a_image`
   用户表
  */
 
-CREATE TABLE `imageprodect`.`a_user`
+CREATE TABLE `a_user`
 (
     `id`           INT         NOT NULL AUTO_INCREMENT,
     `username`     VARCHAR(32) NOT NULL COMMENT '用户名',
@@ -42,7 +43,7 @@ CREATE TABLE `imageprodect`.`a_user`
 
 
 
-CREATE TABLE `imageprodect`.`a_role_user`
+CREATE TABLE `a_role_user`
 (
     `id`      INT NOT NULL AUTO_INCREMENT,
     `role_id` INT NULL,
@@ -51,7 +52,7 @@ CREATE TABLE `imageprodect`.`a_role_user`
 );
 
 
-CREATE TABLE `imageprodect`.`a_role`
+CREATE TABLE `a_role`
 (
     `id`         INT         NOT NULL AUTO_INCREMENT,
     `role_name`  VARCHAR(32) NULL,
@@ -63,9 +64,9 @@ CREATE TABLE `imageprodect`.`a_role`
 
 
 
-INSERT INTO `imageprodect`.`a_role` (`id`, `role_name`, `state`, `permission`)
+INSERT INTO `a_role` (`id`, `role_name`, `state`, `permission`)
 VALUES ('1', '图片管理员', '1', 'ROLE_IMAGE');
-INSERT INTO `imageprodect`.`a_role` (`id`, `role_name`, `state`, `permission`)
+INSERT INTO `a_role` (`id`, `role_name`, `state`, `permission`)
 VALUES ('2', '用户管理员', '1', 'ROLE_USER');
 
 

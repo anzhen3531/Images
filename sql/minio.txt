@@ -1,8 +1,8 @@
 minio 使用docker 构建脚本
+//  拉取minio镜像
 docker pull minio/minio
 
-docker run
-
+// 运行容器
 docker run -p 9000:9000 -p 9001:9001 --name minio
 -e "MINIO_ROOT_USER=root" -e "MINIO_ROOT_PASSWORD=root123456"
 -v /mydata/minio/data:/data -v /mydata/minio/config:/root/.minio
