@@ -1,4 +1,4 @@
-package com.anzhen.config.oauth2.handle;
+package com.anzhen.config.oauth2.github.handle;
 
 import com.alibaba.fastjson.JSON;
 import com.anzhen.common.result.ApiResult;

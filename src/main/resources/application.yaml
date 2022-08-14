@@ -4,8 +4,8 @@ spring:
   datasource:
     username: root
     password: anzhen3531
-    url: jdbc:mysql://172.17.0.1/imageprodect?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false
-    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://172.17.0.1/imageprodect?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
     host: 172.17.0.1
     database: 1

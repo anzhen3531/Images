@@ -1,7 +1,7 @@
 package com.anzhen.config.oauth2;
 
 import com.anzhen.config.CustomerCorsFilter;
-import com.anzhen.config.oauth2.handle.AuthExceptionHandler;
+import com.anzhen.config.oauth2.github.handle.AuthExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -39,7 +39,7 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
     // 请求权限配置
     http.authorizeRequests()
         // 下边的路径放行,不需要经过认证
-        .antMatchers("/image/main/view", "/oauth/token", "/user/info/**", "/update/thumbnail")
+        .antMatchers("/image/main/view", "/oauth/token", "/user/info/**", "/image/manual/get/image")
         .permitAll()
         .antMatchers(
             "/public/**",

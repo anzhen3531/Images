@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.anzhen.common.exception.BadRequestException;
 import com.anzhen.common.result.ApiResult;
 import com.anzhen.entity.AImage;
+import com.anzhen.jsoup.AdvanceImage;
 import com.anzhen.service.AImageService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
@@ -28,6 +29,7 @@ import javax.annotation.Resource;
 public class AImageController {
 
   @Resource AImageService aImageService;
+  @Resource AdvanceImage advanceImage;
 
   @ApiOperation("分页图片查询")
   @GetMapping("/main/view")
@@ -69,6 +71,13 @@ public class AImageController {
       image.setState(1);
       aImageService.updateById(image);
     }
+    return ApiResult.success();
+  }
+
+  @ApiOperation("手动获取图片")
+  @GetMapping("/manual/get/image")
+  public ApiResult<Void> manualGetImage() throws Exception {
+    advanceImage.getThumbnail("https://wallhaven.cc/hot?page=2");
     return ApiResult.success();
   }
 }

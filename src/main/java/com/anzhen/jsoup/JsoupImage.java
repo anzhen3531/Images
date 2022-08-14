@@ -34,10 +34,6 @@ public class JsoupImage {
     System.out.println(document);
   }
 
-  // 反爬虫伪装请求头
-
-  // 案例一
-
   /**
    * 使用爬虫进行爬取
    *

@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.anzhen.common.context.AUserContext;
 import com.anzhen.common.context.AUserContextHolder;
 import com.anzhen.common.result.CommonState;
+import com.anzhen.common.utils.InputStreamUtils;
 import com.anzhen.config.minio.MinioProperties;
 import com.anzhen.entity.AImage;
 import com.anzhen.entity.AUser;
@@ -15,12 +16,17 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,7 +57,10 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
       // 如果用户登录了  并且以及拉黑了图片的话 应该进行排除这些图片id
       QueryWrapper<AUserBackList> queryWrapper = new QueryWrapper<>();
       queryWrapper.eq("user_id", aUserContext.getaUser().getId());
-      list = aUserBackListService.list(queryWrapper).stream().map(AUserBackList::getImageId).collect(Collectors.toList());
+      list =
+          aUserBackListService.list(queryWrapper).stream()
+              .map(AUserBackList::getImageId)
+              .collect(Collectors.toList());
     }
     Page<AImage> page = new Page<>(currentPage, size);
     return aImageMapper.mainView(page, CommonState.state, list);
@@ -90,13 +99,19 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
   @Override
   public void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize)
       throws Exception {
-    fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream, objectSize);
+    ByteArrayOutputStream outputStream = InputStreamUtils.cacheInputStream(inputStream);
+    InputStream copyInputStream = new ByteArrayInputStream(outputStream.toByteArray());
+    // 将流保存并二次使用
+    fileUploadService.fileUpload(properties.getBucket(), filePath, copyInputStream, objectSize);
+    // 编写缩略图
     // 将文件设置进去数据库
     AImage aImage = new AImage();
     // 设置默认属性
     aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());
     aImage.setState(CommonState.state);
     aImage.setImagePath(filePath);
+    aImage.setThumbnailImagePath(
+        getThumbnail(new ByteArrayInputStream(outputStream.toByteArray()), filePath));
     aImageMapper.insert(aImage);
   }
 
@@ -107,5 +122,24 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
     AImage aImage = aImageMapper.selectOne(queryWrapper);
     fileUploadService.delFile(properties.getBucket(), aImage.getImagePath());
     aImageMapper.deleteById(id);
+  }
+
+  /**
+   * 获取缩略图路径
+   *
+   * @param inputStream 原图输入流
+   * @return
+   */
+  public String getThumbnail(InputStream inputStream, String filePath) throws Exception {
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    String suffix = filePath.substring(filePath.lastIndexOf(".") + 1);
+    BufferedImage originalImage = ImageIO.read(inputStream);
+    BufferedImage thumbnail = Thumbnails.of(originalImage).scale(0.25).asBufferedImage();
+    ImageIO.write(thumbnail, suffix, outputStream);
+    InputStream thumbnaiInputStream = new ByteArrayInputStream(outputStream.toByteArray());
+    String thumbnailPath = "thumbnail/" + UUID.randomUUID() + "." + suffix;
+    fileUploadService.fileUpload(
+        properties.getBucket(), thumbnailPath, thumbnaiInputStream, inputStream.available());
+    return thumbnailPath;
   }
 }
