@@ -4,7 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.anzhen.common.context.AUserContext;
 import com.anzhen.common.context.AUserContextHolder;
 import com.anzhen.common.result.CommonState;
-import com.anzhen.common.utils.InputStreamUtils;
+import com.anzhen.common.utils.InputStreamCacher;
 import com.anzhen.config.minio.MinioProperties;
 import com.anzhen.entity.AImage;
 import com.anzhen.entity.AUser;
@@ -99,10 +99,10 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
   @Override
   public void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize)
       throws Exception {
-    ByteArrayOutputStream outputStream = InputStreamUtils.cacheInputStream(inputStream);
-    InputStream copyInputStream = new ByteArrayInputStream(outputStream.toByteArray());
+    InputStreamCacher cache = new InputStreamCacher(inputStream);
     // 将流保存并二次使用
-    fileUploadService.fileUpload(properties.getBucket(), filePath, copyInputStream, objectSize);
+    fileUploadService.fileUpload(
+        properties.getBucket(), filePath, cache.getInputStream(), objectSize);
     // 编写缩略图
     // 将文件设置进去数据库
     AImage aImage = new AImage();
@@ -110,8 +110,7 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
     aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());
     aImage.setState(CommonState.state);
     aImage.setImagePath(filePath);
-    aImage.setThumbnailImagePath(
-        getThumbnail(new ByteArrayInputStream(outputStream.toByteArray()), filePath));
+    aImage.setThumbnailImagePath(getThumbnail(cache.getInputStream(), filePath));
     aImageMapper.insert(aImage);
   }
 
@@ -139,7 +138,7 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage>
     InputStream thumbnaiInputStream = new ByteArrayInputStream(outputStream.toByteArray());
     String thumbnailPath = "thumbnail/" + UUID.randomUUID() + "." + suffix;
     fileUploadService.fileUpload(
-        properties.getBucket(), thumbnailPath, thumbnaiInputStream, inputStream.available());
+        properties.getBucket(), thumbnailPath, thumbnaiInputStream, thumbnaiInputStream.available());
     return thumbnailPath;
   }
 }

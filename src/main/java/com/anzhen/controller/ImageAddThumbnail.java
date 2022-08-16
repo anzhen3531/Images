@@ -7,6 +7,7 @@ import com.anzhen.service.AImageService;
 import com.anzhen.service.FileUploadService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -29,11 +30,12 @@ public class ImageAddThumbnail {
   @Resource private AImageService aimageService;
   @Resource private FileUploadService fileUploadService;
 
-  //  @GetMapping("/update/thumbnail")
+//  @GetMapping("/update/thumbnail")
   public ApiResult<Void> updateThumbnail() {
     // 获取全部的图片对象
     QueryWrapper<AImage> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq("state", CommonState.state);
+    queryWrapper.isNull("thumbnail_image_path");
     // 将图片截取为 300 * 200 个像素
     List<AImage> list = aimageService.list(queryWrapper);
     // 通过url获取到

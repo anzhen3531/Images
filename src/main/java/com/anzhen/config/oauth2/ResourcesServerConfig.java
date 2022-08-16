@@ -30,7 +30,7 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
         .stateless(true)
         .accessDeniedHandler(authExceptionHandler)
         .authenticationEntryPoint(authExceptionHandler); // 设置异常处理端点
-//    // 设置token存储
+    //    // 设置token存储
     resources.tokenStore(redisTokenStore);
   }
 
@@ -39,7 +39,12 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
     // 请求权限配置
     http.authorizeRequests()
         // 下边的路径放行,不需要经过认证
-        .antMatchers("/image/main/view", "/oauth/token", "/user/info/**", "/image/manual/get/image")
+        .antMatchers(
+            "/image/main/view",
+            "/oauth/token",
+            "/user/info/**",
+            "/image/manual/get/image",
+            "/update/thumbnail")
         .permitAll()
         .antMatchers(
             "/public/**",
