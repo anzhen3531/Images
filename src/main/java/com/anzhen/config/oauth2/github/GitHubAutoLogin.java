@@ -35,6 +35,7 @@ public class GitHubAutoLogin {
     Map resp = restTemplate.postForObject(GITHUB_TOKEN_URL, map, Map.class);
     System.out.println(resp);
     HttpHeaders httpheaders = new HttpHeaders();
+    assert resp != null;
     httpheaders.add("Authorization", "token " + resp.get("access_token"));
     HttpEntity<?> httpEntity = new HttpEntity<>(httpheaders);
     ResponseEntity<Map> exchange =
@@ -42,6 +43,7 @@ public class GitHubAutoLogin {
     log.info("返回得到的github Json信息 {} ", exchange.getBody());
     Map body = exchange.getBody();
     AUser aUser = new AUser();
+    assert body != null;
     aUser.setUsername((String) body.get("login"));
     aUser.setName((String) body.get("name"));
     aUser.setEmail((String) body.get("email"));

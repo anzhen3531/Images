@@ -1,17 +1,5 @@
 package com.anzhen.controller;
 
-import com.anzhen.common.result.ApiResult;
-import com.anzhen.common.result.CommonState;
-import com.anzhen.entity.AImage;
-import com.anzhen.service.AImageService;
-import com.anzhen.service.FileUploadService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import net.coobird.thumbnailator.Thumbnails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,6 +9,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+
+import org.springframework.web.bind.annotation.RestController;
+
+import com.anzhen.common.result.ApiResult;
+import com.anzhen.common.result.CommonState;
+import com.anzhen.entity.AImage;
+import com.anzhen.service.AImageService;
+import com.anzhen.service.FileUploadService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
+import net.coobird.thumbnailator.Thumbnails;
+
 @RestController
 public class ImageAddThumbnail {
 
@@ -28,7 +30,8 @@ public class ImageAddThumbnail {
   private static final String BUCKET_NAME = "wallhaven-photo";
   private static final String THUMBNAIL_NAME = "thumbnail/";
   @Resource private AImageService aimageService;
-  @Resource private FileUploadService fileUploadService;
+  @Resource
+  private FileUploadService fileUploadService;
 
 //  @GetMapping("/update/thumbnail")
   public ApiResult<Void> updateThumbnail() {
