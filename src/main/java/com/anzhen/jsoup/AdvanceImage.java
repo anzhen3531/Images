@@ -1,6 +1,7 @@
 package com.anzhen.jsoup;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.anzhen.service.AImageService;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -59,6 +60,15 @@ public class AdvanceImage {
      */
     static Document document;
 
+    // 大图路径
+    public static List<String> hrefs = null;
+    /**
+     * 缩略图路径
+     */
+    public static List<String> thumbnails = null;
+
+    public static Integer index;
+
     static {
         // 封装请求头
         headers.put("Referer", "https://wallhaven.cc/");
@@ -99,6 +109,7 @@ public class AdvanceImage {
      * @param path : 文件路径
      */
     public void getThumbnail(String path) throws Exception {
+        index = 0;
         document = Jsoup.connect(path).headers(headers).get();
         log.info("解析文件成功");
         // 获取首页标签的缩略图
@@ -122,7 +133,8 @@ public class AdvanceImage {
      * @param className 类选择器名称
      */
     public List<String> getIndexImage(String className) {
-        List<String> hrefs = new ArrayList<>();
+        // 大图路径
+        hrefs = new ArrayList<>();
         Elements elements = document.getElementsByClass(className);
         for (Element element : elements) {
             Elements li = element.getElementsByTag("li");
@@ -132,6 +144,14 @@ public class AdvanceImage {
                 for (Element element2 : a) {
                     String href = element2.attr("href");
                     if (!href.isBlank() && !href.isEmpty()) hrefs.add(href);
+                }
+                // 缩略图地址
+                Elements img = element1.getElementsByTag("image");
+                for (Element element2 : img) {
+                    String src = element2.attr("src");
+                    if (StrUtil.isNotBlank(src)) {
+                        thumbnails.add(src);
+                    }
                 }
             }
         }
@@ -238,12 +258,19 @@ public class AdvanceImage {
         // 打开url 流
         URLConnection urlConnection = new URL(path).openConnection();
         InputStream inputStream = urlConnection.getInputStream();
+        URLConnection thumbnailsConnection = new URL(thumbnails.get(index)).openConnection();
+        InputStream thumbnailsInputStream = thumbnailsConnection.getInputStream();
         String suffix = path.substring(path.lastIndexOf("."));
+        String thumbnailsSuffix = path.substring(thumbnails.get(index).lastIndexOf("."));
         // 使用流去写入文件
-        aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength());
+        aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength(),
+                thumbnailsInputStream, thumbnailsSuffix, thumbnailsConnection.getContentLength());
         log.info("写入完成 ！！！！");
         if (ObjectUtil.isNotNull(inputStream)) {
             inputStream.close();
+        }
+        if (ObjectUtil.isNotNull(thumbnailsInputStream)) {
+            thumbnailsInputStream.close();
         }
         log.info("耗时为:" + (System.currentTimeMillis() - startTime) / 1000);
     }

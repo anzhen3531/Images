@@ -16,32 +16,42 @@ import java.util.List;
  */
 public interface AImageService extends IService<AImage> {
 
-  Page<AImage> mainView(Integer currentPage, Integer size);
+    Page<AImage> mainView(Integer currentPage, Integer size);
 
-  /** 查询全部的图片 */
-  List<AImage> findMainView();
+    /**
+     * 查询全部的图片
+     */
+    List<AImage> findMainView();
 
-  /**
-   * 上传图片
-   *
-   * @param multipartFile
-   */
-  void uploadFileAndDb(MultipartFile multipartFile);
+    /**
+     * 上传图片
+     *
+     * @param multipartFile
+     */
+    void uploadFileAndDb(MultipartFile multipartFile);
 
-  /**
-   * 通过流上传文件
-   *
-   * @param inputStream
-   * @param filePath
-   * @throws Exception
-   */
-  void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize)
-      throws Exception;
+    /**
+     * 通过流上传文件
+     *
+     * @param inputStream
+     * @param filePath
+     * @throws Exception
+     */
+    void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize) throws Exception;
 
-  /**
-   * 删除图片
-   *
-   * @param id
-   */
-  void delete(String id);
+    /**
+     * 通过流上传文件
+     *
+     * @param inputStream
+     * @param filePath
+     * @throws Exception
+     */
+    void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize, InputStream inputStreamThumbnail, String thumbnailPath, Integer thumbnailObjectSize) throws Exception;
+
+    /**
+     * 删除图片
+     *
+     * @param id
+     */
+    void delete(String id);
 }

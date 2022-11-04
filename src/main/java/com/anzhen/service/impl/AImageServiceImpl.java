@@ -117,6 +117,23 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage> impleme
     }
 
     @Override
+    public void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize, InputStream inputStreamThumbnail,
+                                String thumbnailPath, Integer thumbnailObjectSize) throws Exception {
+        // 将流保存并二次使用
+        fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream, objectSize);
+        // 编写缩略图
+        // 将文件设置进去数据库
+        AImage aImage = new AImage();
+        // 设置默认属性
+        aImage.setImageId(CommonState.PC_UPLOAD + System.currentTimeMillis());
+        aImage.setState(CommonState.state);
+        aImage.setImagePath(filePath);
+        fileUploadService.fileUpload(properties.getBucket(), thumbnailPath, inputStreamThumbnail, thumbnailObjectSize);
+        aImage.setThumbnailImagePath(thumbnailPath);
+        aImageMapper.insert(aImage);
+    }
+
+    @Override
     public void delete(String id) {
         QueryWrapper<AImage> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", id);
