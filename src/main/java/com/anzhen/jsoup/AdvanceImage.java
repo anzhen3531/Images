@@ -1,5 +1,20 @@
 package com.anzhen.jsoup;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.anzhen.service.AImageService;
+import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.helper.StringUtil;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -12,43 +27,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-
-import org.jsoup.Jsoup;
-import org.jsoup.helper.StringUtil;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
-import com.anzhen.service.AImageService;
-
-import lombok.extern.slf4j.Slf4j;
-
-/** 这个只是针对首页 */
+/**
+ * 这个只是针对首页
+ */
 @Component
 @Slf4j
 @EnableScheduling
 @EnableAsync
 public class AdvanceImage {
 
-    /** 爬取的网站基础前缀 */
+    /**
+     * 爬取的网站基础前缀
+     */
     static final String basePath = "https://wallhaven.cc/hot?page=";
 
-    /** 创建默认大小的缓冲区 */
+    /**
+     * 创建默认大小的缓冲区
+     */
     static ByteBuffer buffer = ByteBuffer.allocate(1024);
 
     @Resource
     AImageService aImageService;
 
-    /** 封装请求头 */
+    /**
+     * 封装请求头
+     */
     static HashMap<String, String> headers = new HashMap<>();
 
-    /** 文档对象 */
+    /**
+     * 文档对象
+     */
     static Document document;
 
     static {
@@ -57,8 +65,7 @@ public class AdvanceImage {
         headers.put("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
         headers.put("sec-ch-ua-mobile", "?0");
         headers.put("sec-ch-ua-platform", "Windows");
-        headers.put("User-Agent",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
+        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
     }
 
     /**
@@ -124,8 +131,7 @@ public class AdvanceImage {
                 Elements a = element1.getElementsByTag("a");
                 for (Element element2 : a) {
                     String href = element2.attr("href");
-                    if (!href.isBlank() && !href.isEmpty())
-                        hrefs.add(href);
+                    if (!href.isBlank() && !href.isEmpty()) hrefs.add(href);
                 }
             }
         }
@@ -150,7 +156,9 @@ public class AdvanceImage {
         return hrefs;
     }
 
-    /** 遍历缩略图路径 获取大图路径 */
+    /**
+     * 遍历缩略图路径 获取大图路径
+     */
     public List<String> getPhotoPath(Document document) {
         List<String> list = new ArrayList<>();
         Elements scrollbox = document.getElementsByClass("scrollbox");
@@ -164,7 +172,9 @@ public class AdvanceImage {
         return list;
     }
 
-    /** 写入到本地文件 */
+    /**
+     * 写入到本地文件
+     */
     public void writePhoto(String path) throws Exception {
         if (StringUtil.isBlank(path)) {
             return;
@@ -174,8 +184,7 @@ public class AdvanceImage {
         InputStream inputStream = new URL(path).openStream();
         try (FileOutputStream fileOutputStream = new FileOutputStream("D:\\Files\\" + UUID.randomUUID() + ".jpg")) {
             int temp;
-            while ((temp = inputStream.read()) != -1)
-                fileOutputStream.write(temp);
+            while ((temp = inputStream.read()) != -1) fileOutputStream.write(temp);
         }
         long endTime = System.currentTimeMillis();
         System.out.println("写入完成 ！！！！");
@@ -218,7 +227,9 @@ public class AdvanceImage {
         log.info("耗时为:" + (endTime - startTime) / 1000);
     }
 
-    /** 通过MinIO接口进行上传 */
+    /**
+     * 通过MinIO接口进行上传
+     */
     public void writePhotoByMinIO(String path) throws Exception {
         if (StringUtil.isBlank(path)) {
             return;
@@ -231,6 +242,9 @@ public class AdvanceImage {
         // 使用流去写入文件
         aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength());
         log.info("写入完成 ！！！！");
+        if (ObjectUtil.isNotNull(inputStream)) {
+            inputStream.close();
+        }
         log.info("耗时为:" + (System.currentTimeMillis() - startTime) / 1000);
     }
 }
