@@ -80,7 +80,7 @@ public class AImageController {
     @ApiOperation("手动获取图片")
     @GetMapping("/manual/get/image")
     public ApiResult<Void> manualGetImage() throws Exception {
-        advanceImage.getThumbnail("https://wallhaven.cc/hot?page=9");
+        advanceImage.getThumbnail("https://wallhaven.cc/hot?page=1");
         return ApiResult.success();
     }
 }

@@ -23,10 +23,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * 这个只是针对首页
@@ -65,9 +62,7 @@ public class AdvanceImage {
     /**
      * 缩略图路径
      */
-    public static List<String> thumbnails = null;
-
-    public static Integer index;
+    public static Map<String, String> thumbnailsMapping = null;
 
     static {
         // 封装请求头
@@ -109,8 +104,8 @@ public class AdvanceImage {
      * @param path : 文件路径
      */
     public void getThumbnail(String path) throws Exception {
-        index = 0;
         document = Jsoup.connect(path).headers(headers).get();
+        thumbnailsMapping = new HashMap<>();
         log.info("解析文件成功");
         // 获取首页标签的缩略图
         List<String> tagThumbnail = getIndexImage("thumb-listing-page");
@@ -118,11 +113,10 @@ public class AdvanceImage {
         for (String s : tagThumbnail) {
             // 代码优化 使用异步写入文件
             List<String> photoPath = getPhotoPath(Jsoup.connect(s).headers(headers).get());
-            System.out.println(photoPath);
-            // 写入本地文件
-            // 可以采用线程池
+            String s2 = thumbnailsMapping.get(s);
+            log.info("key {} -> value {}", s, s2);
             for (String s1 : photoPath) {
-                writePhotoByMinIO(s1);
+                writePhotoByMinIO(s1, s2);
             }
         }
     }
@@ -141,16 +135,21 @@ public class AdvanceImage {
             for (Element element1 : li) {
                 // 获取到A标签之后的内容 保存缩略图
                 Elements a = element1.getElementsByTag("a");
+                String href = null;
                 for (Element element2 : a) {
-                    String href = element2.attr("href");
-                    if (!href.isBlank() && !href.isEmpty()) hrefs.add(href);
+                    href = element2.attr("href");
+                    if (!href.isBlank() && !href.isEmpty()) {
+                        hrefs.add(href);
+                        break;
+                    }
                 }
                 // 缩略图地址
-                Elements img = element1.getElementsByTag("image");
-                for (Element element2 : img) {
-                    String src = element2.attr("src");
-                    if (StrUtil.isNotBlank(src)) {
-                        thumbnails.add(src);
+                Elements img = element1.getElementsByTag("img");
+                for (Element imgElement : img) {
+                    String src = imgElement.attr("data-src");
+                    if (StrUtil.isNotBlank(src) && StrUtil.isNotBlank(href)) {
+                        thumbnailsMapping.put(href, src);
+                        break;
                     }
                 }
             }
@@ -250,7 +249,7 @@ public class AdvanceImage {
     /**
      * 通过MinIO接口进行上传
      */
-    public void writePhotoByMinIO(String path) throws Exception {
+    public void writePhotoByMinIO(String path, String thumbnailsPath) throws Exception {
         if (StringUtil.isBlank(path)) {
             return;
         }
@@ -258,13 +257,13 @@ public class AdvanceImage {
         // 打开url 流
         URLConnection urlConnection = new URL(path).openConnection();
         InputStream inputStream = urlConnection.getInputStream();
-        URLConnection thumbnailsConnection = new URL(thumbnails.get(index)).openConnection();
+        // 会造成获取不到的情况
+        URLConnection thumbnailsConnection = new URL(thumbnailsPath).openConnection();
         InputStream thumbnailsInputStream = thumbnailsConnection.getInputStream();
         String suffix = path.substring(path.lastIndexOf("."));
-        String thumbnailsSuffix = path.substring(thumbnails.get(index).lastIndexOf("."));
+        String thumbnailsSuffix = path.substring(thumbnailsPath.lastIndexOf("."));
         // 使用流去写入文件
-        aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength(),
-                thumbnailsInputStream, thumbnailsSuffix, thumbnailsConnection.getContentLength());
+        aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength(), thumbnailsInputStream, thumbnailsSuffix, thumbnailsConnection.getContentLength());
         log.info("写入完成 ！！！！");
         if (ObjectUtil.isNotNull(inputStream)) {
             inputStream.close();
