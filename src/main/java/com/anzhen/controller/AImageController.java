@@ -41,17 +41,6 @@ public class AImageController {
         return ApiResult.success(aImageService.mainView(page, size));
     }
 
-    @ApiOperation("图片上传")
-    @PostMapping("/upload")
-    @PreAuthorize("hasRole('ROLE_IMAGE')")
-    public ApiResult<Void> photoUpload(@RequestPart("file") MultipartFile file) {
-        // 接收文件 进行上传
-        if (ObjectUtil.isEmpty(file)) {
-            throw new BadRequestException("文件为空");
-        }
-        aImageService.uploadFileAndDb(file);
-        return ApiResult.success();
-    }
 
     @PutMapping("/{id}")
     @ApiOperation("删除图片")

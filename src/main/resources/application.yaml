@@ -17,17 +17,20 @@ spring:
       max-file-size: 20MB
       max-request-size: 20MB
 
+# 爬虫爬取的网站应该是从配置文件中获取
 logging:
   level:
     com.anzhen.mapper: DEBUG
 
+# MinIO对象存储相关配置
 minio:
   endpoint: http://172.17.0.1
   port: 9000
   accessKey: root
   secretKey: root123456
   bucket: wallhaven-photo
-
+  
+# github 第三方登录相关配置
 github:
   clientId: 1c5c71a9fc77bea14869
   clientSecret: 26d3bee4fa42c7544f118774154176dc8679bbb0
