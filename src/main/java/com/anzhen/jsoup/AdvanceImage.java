@@ -1,9 +1,16 @@
 package com.anzhen.jsoup;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import com.anzhen.service.AImageService;
-import lombok.extern.slf4j.Slf4j;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.*;
+
+import javax.annotation.Resource;
+
 import org.jsoup.Jsoup;
 import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
@@ -15,15 +22,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.*;
+import com.anzhen.service.AImageService;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 这个只是针对首页
@@ -64,13 +68,16 @@ public class AdvanceImage {
      */
     public static Map<String, String> thumbnailsMapping = null;
 
+    public static List<String> tags = null;
+
     static {
         // 封装请求头
         headers.put("Referer", "https://wallhaven.cc/");
         headers.put("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
         headers.put("sec-ch-ua-mobile", "?0");
         headers.put("sec-ch-ua-platform", "Windows");
-        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
+        headers.put("User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
     }
 
     /**
@@ -112,13 +119,43 @@ public class AdvanceImage {
         log.info("获取图片选择器成功");
         for (String s : tagThumbnail) {
             // 代码优化 使用异步写入文件
-            List<String> photoPath = getPhotoPath(Jsoup.connect(s).headers(headers).get());
+            Document photoDoc = Jsoup.connect(s).headers(headers).get();
+            List<String> photoPath = getPhotoPath(photoDoc);
+            List<String> tags = getTags(photoDoc);
             String s2 = thumbnailsMapping.get(s);
             log.info("key {} -> value {}", s, s2);
             for (String s1 : photoPath) {
                 writePhotoByMinIO(s1, s2);
             }
+            for (String tag : tags) {
+                // TODO 写入标签 暂时没DAO
+            }
         }
+    }
+
+    /**
+     * 获取图片的标签
+     * 
+     * @param document
+     * @return
+     */
+    private List<String> getTags(Document document) {
+        // 获取标签的外层对象
+        tags = new ArrayList<>();
+        Elements elementsByClass = document.getElementsByClass("tag tag-sfw");
+        if (CollUtil.isEmpty(elementsByClass)) {
+            return new ArrayList<>();
+        }
+        for (Element element : elementsByClass) {
+            Elements tagAList = element.getElementsByTag("a");
+            if (CollUtil.isEmpty(tagAList)) {
+                continue;
+            }
+            for (Element tagA : tagAList) {
+                tags.add(tagA.text());
+            }
+        }
+        return tags;
     }
 
     /**
@@ -203,7 +240,8 @@ public class AdvanceImage {
         InputStream inputStream = new URL(path).openStream();
         try (FileOutputStream fileOutputStream = new FileOutputStream("D:\\Files\\" + UUID.randomUUID() + ".jpg")) {
             int temp;
-            while ((temp = inputStream.read()) != -1) fileOutputStream.write(temp);
+            while ((temp = inputStream.read()) != -1)
+                fileOutputStream.write(temp);
         }
         long endTime = System.currentTimeMillis();
         System.out.println("写入完成 ！！！！");
@@ -263,7 +301,8 @@ public class AdvanceImage {
         String suffix = path.substring(path.lastIndexOf("."));
         String thumbnailsSuffix = path.substring(thumbnailsPath.lastIndexOf("."));
         // 使用流去写入文件
-        aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength(), thumbnailsInputStream, thumbnailsSuffix, thumbnailsConnection.getContentLength());
+        aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength(),
+            thumbnailsInputStream, thumbnailsSuffix, thumbnailsConnection.getContentLength());
         log.info("写入完成 ！！！！");
         if (ObjectUtil.isNotNull(inputStream)) {
             inputStream.close();
