@@ -99,3 +99,24 @@ CREATE TABLE `oauth_client_details`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_bin;
+
+
+# 图片和标签关联表
+CREATE TABLE `a_image_tag`
+(
+    `id`       BIGINT NOT NULL,
+    `image_id` BIGINT NOT NULL,
+    `tag_id`   BIGINT NOT NULL,
+    PRIMARY KEY (`id`)
+);
+
+# 标签表
+CREATE TABLE `a_tag`
+(
+    ` id `       BIGINT      NOT NULL,
+    ` tag_name ` VARCHAR(64) NOT NULL,
+    ` state `    TINYINT(4) DEFAULT 1,
+    PRIMARY KEY (` id `)
+);
+
+

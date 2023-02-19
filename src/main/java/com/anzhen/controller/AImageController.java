@@ -1,12 +1,12 @@
 package com.anzhen.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.anzhen.common.exception.BadRequestException;
 import com.anzhen.common.result.ApiResult;
 import com.anzhen.entity.AImage;
 import com.anzhen.jsoup.AdvanceImage;
@@ -41,6 +41,11 @@ public class AImageController {
         return ApiResult.success(aImageService.mainView(page, size));
     }
 
+    @ApiOperation("通过标签查询图片")
+    @GetMapping("/tag")
+    public ApiResult<List<AImage>> findImageByTag(@RequestParam("tag") String tag) {
+        return ApiResult.success(aImageService.findImageByTag(tag));
+    }
 
     @PutMapping("/{id}")
     @ApiOperation("删除图片")

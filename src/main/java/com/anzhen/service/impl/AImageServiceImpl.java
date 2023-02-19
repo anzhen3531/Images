@@ -23,9 +23,12 @@ import com.anzhen.common.result.CommonState;
 import com.anzhen.common.utils.InputStreamCacher;
 import com.anzhen.config.minio.MinioProperties;
 import com.anzhen.entity.AImage;
+import com.anzhen.entity.ATag;
 import com.anzhen.entity.AUser;
 import com.anzhen.entity.AUserBackList;
 import com.anzhen.mapper.AImageMapper;
+import com.anzhen.service.AImageTagService;
+import com.anzhen.service.ATagService;
 import com.anzhen.service.AUserBackListService;
 import com.anzhen.service.FileUploadService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -54,6 +57,10 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage> impleme
     AImageMapper aImageMapper;
     @Resource
     AUserBackListService aUserBackListService;
+    @Resource
+    AImageTagService aImageTagService;
+    @Resource
+    ATagService aTagService;
 
     @Override
     public Page<AImage> mainView(Integer currentPage, Integer size) {
@@ -73,6 +80,13 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage> impleme
     @Override
     public List<AImage> findMainView() {
         return aImageMapper.selectList(null);
+    }
+
+    @Override
+    public List<AImage> findImageByTag(String tagName) {
+        ATag tag = aTagService.findTagByName(tagName);
+        List<String> imageIds = aImageTagService.findImageIdByTagId(tag.getId());
+        return aImageMapper.selectBatchIds(imageIds);
     }
 
     @Override
@@ -117,8 +131,8 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage> impleme
     }
 
     @Override
-    public void uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize, InputStream inputStreamThumbnail,
-                                String thumbnailPath, Integer thumbnailObjectSize) throws Exception {
+    public AImage uploadFileAndDb(InputStream inputStream, String filePath, Integer objectSize,
+        InputStream inputStreamThumbnail, String thumbnailPath, Integer thumbnailObjectSize) throws Exception {
         // 将流保存并二次使用
         fileUploadService.fileUpload(properties.getBucket(), filePath, inputStream, objectSize);
         // 编写缩略图
@@ -131,6 +145,7 @@ public class AImageServiceImpl extends ServiceImpl<AImageMapper, AImage> impleme
         fileUploadService.fileUpload(properties.getBucket(), thumbnailPath, inputStreamThumbnail, thumbnailObjectSize);
         aImage.setThumbnailImagePath(thumbnailPath);
         aImageMapper.insert(aImage);
+        return aImage;
     }
 
     @Override

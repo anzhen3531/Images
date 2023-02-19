@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -22,7 +23,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.anzhen.entity.AImage;
+import com.anzhen.entity.AImageTag;
+import com.anzhen.entity.ATag;
 import com.anzhen.service.AImageService;
+import com.anzhen.service.AImageTagService;
+import com.anzhen.service.ATagService;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -51,6 +57,11 @@ public class AdvanceImage {
     @Resource
     AImageService aImageService;
 
+    @Resource
+    AImageTagService aImageTagService;
+
+    @Resource
+    ATagService aTagService;
     /**
      * 封装请求头
      */
@@ -68,7 +79,7 @@ public class AdvanceImage {
      */
     public static Map<String, String> thumbnailsMapping = null;
 
-    public static List<String> tags = null;
+    public static List<ATag> tags = null;
 
     static {
         // 封装请求头
@@ -78,6 +89,11 @@ public class AdvanceImage {
         headers.put("sec-ch-ua-platform", "Windows");
         headers.put("User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
+    }
+
+    public static void main(String[] args) {
+        AdvanceImage advanceImage = new AdvanceImage();
+        advanceImage.scheduledTask();
     }
 
     /**
@@ -111,6 +127,7 @@ public class AdvanceImage {
      * @param path : 文件路径
      */
     public void getThumbnail(String path) throws Exception {
+        ATag aTag = null;
         document = Jsoup.connect(path).headers(headers).get();
         thumbnailsMapping = new HashMap<>();
         log.info("解析文件成功");
@@ -121,14 +138,12 @@ public class AdvanceImage {
             // 代码优化 使用异步写入文件
             Document photoDoc = Jsoup.connect(s).headers(headers).get();
             List<String> photoPath = getPhotoPath(photoDoc);
-            List<String> tags = getTags(photoDoc);
+            List<ATag> tags = getTags(photoDoc);
             String s2 = thumbnailsMapping.get(s);
             log.info("key {} -> value {}", s, s2);
             for (String s1 : photoPath) {
-                writePhotoByMinIO(s1, s2);
-            }
-            for (String tag : tags) {
-                // TODO 写入标签 暂时没DAO
+                writePhotoByMinIO(s1, s2, tags);
+                log.info("photoPath -> {}", s1);
             }
         }
     }
@@ -139,9 +154,10 @@ public class AdvanceImage {
      * @param document
      * @return
      */
-    private List<String> getTags(Document document) {
+    private List<ATag> getTags(Document document) {
         // 获取标签的外层对象
         tags = new ArrayList<>();
+        ATag aTag = null;
         Elements elementsByClass = document.getElementsByClass("tag tag-sfw");
         if (CollUtil.isEmpty(elementsByClass)) {
             return new ArrayList<>();
@@ -152,7 +168,11 @@ public class AdvanceImage {
                 continue;
             }
             for (Element tagA : tagAList) {
-                tags.add(tagA.text());
+                if (StrUtil.isNotBlank(tagA.text())) {
+                    aTag = new ATag();
+                    aTag.setTagName(tagA.text());
+                    tags.add(aTag);
+                }
             }
         }
         return tags;
@@ -287,11 +307,14 @@ public class AdvanceImage {
     /**
      * 通过MinIO接口进行上传
      */
-    public void writePhotoByMinIO(String path, String thumbnailsPath) throws Exception {
+    public void writePhotoByMinIO(String path, String thumbnailsPath, List<ATag> tags) throws Exception {
         if (StringUtil.isBlank(path)) {
             return;
         }
         long startTime = System.currentTimeMillis();
+        // 写入全部的标签
+        aTagService.saveBatch(tags);
+        List<Integer> tagIds = tags.stream().map(ATag::getId).collect(Collectors.toList());
         // 打开url 流
         URLConnection urlConnection = new URL(path).openConnection();
         InputStream inputStream = urlConnection.getInputStream();
@@ -301,8 +324,17 @@ public class AdvanceImage {
         String suffix = path.substring(path.lastIndexOf("."));
         String thumbnailsSuffix = path.substring(thumbnailsPath.lastIndexOf("."));
         // 使用流去写入文件
-        aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength(),
-            thumbnailsInputStream, thumbnailsSuffix, thumbnailsConnection.getContentLength());
+        AImage image =
+            aImageService.uploadFileAndDb(inputStream, UUID.randomUUID() + suffix, urlConnection.getContentLength(),
+                thumbnailsInputStream, thumbnailsSuffix, thumbnailsConnection.getContentLength());
+        AImageTag aImageTag;
+
+        for (Integer tagId : tagIds) {
+            aImageTag = new AImageTag();
+            aImageTag.setImageId(image.getId());
+            aImageTag.setTadId(tagId);
+            aImageTagService.save(aImageTag);
+        }
         log.info("写入完成 ！！！！");
         if (ObjectUtil.isNotNull(inputStream)) {
             inputStream.close();
